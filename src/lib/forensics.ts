@@ -518,7 +518,7 @@ export async function analyzeAudio(file: File): Promise<{ result: AnalysisResult
     const m = fftMag(frame);
     spec.push(m);
     let num = 0, den = 0;
-    for (let k = 0; k < rows; k++) { num += k * m[k]!; den += m[k]!; meanSpec[k] += m[k]! / cols; }
+    for (let k = 0; k < rows; k++) { num += k * m[k]!; den += m[k]!; meanSpec[k] = (meanSpec[k] ?? 0) + m[k]! / cols; }
     centroid.push({ x: round(off / sr, 2), y: Math.round(den > 0 ? ((num / den) * sr) / N : 0) });
   }
   // Effective bandwidth: highest frequency whose average energy is within 60 dB of the maximum.
