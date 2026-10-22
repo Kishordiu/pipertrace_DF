@@ -242,7 +242,7 @@ function AuthPage() {
                           ? "Allow the Supabase callback URI in Google Cloud and allow this app's /auth return URL in Supabase Auth URL Configuration."
                           : "Check the Google provider configuration in Supabase. Email/password sign-in remains available."}
                   </p>
-                  <a className="mt-2 inline-flex font-semibold underline underline-offset-2" href="/docs/AUTH_SETUP.md" target="_blank" rel="noreferrer">
+                  <a className="mt-2 inline-flex font-semibold underline underline-offset-2" href="https://github.com/Kishordiu/diufoundry-storybook/blob/main/docs/GOOGLE_OAUTH_SETUP.md" target="_blank" rel="noreferrer">
                     View setup instructions
                   </a>
                 </div>
