@@ -34,6 +34,7 @@ function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [googleAuthIssue, setGoogleAuthIssue] = useState<"missing-secret" | "provider-disabled" | "redirect" | "generic" | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -134,18 +135,34 @@ function AuthPage() {
 
   async function signInWithGoogle() {
     if (busy) return;
+    setGoogleAuthIssue(null);
     setBusy(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: window.location.origin + "/auth" },
+        options: {
+          redirectTo: window.location.origin + "/auth",
+          // Request only the standard Google identity needed for sign-in.
+          // Additional Google APIs must have a separate, explicit consent flow.
+          scopes: "openid email profile",
+        },
       });
       if (error) throw error;
     } catch (error) {
       const message = error instanceof Error ? error.message : "Google sign-in is unavailable.";
-      toast.error(/provider.*(not enabled|disabled)/i.test(message)
-        ? "Google sign-in is not enabled in Supabase yet. Email/password sign-in is still available."
-        : message);
+      if (/missing oauth secret|missing.*client secret|external_google_secret|unsupported provider/i.test(message)) {
+        setGoogleAuthIssue("missing-secret");
+        toast.error("Google sign-in needs one-time provider configuration.");
+      } else if (/provider.*(not enabled|disabled)/i.test(message)) {
+        setGoogleAuthIssue("provider-disabled");
+        toast.error("Google sign-in is not enabled in Supabase yet.");
+      } else if (/redirect.*(allow|url|not.*permitted)|not.*allowlisted|redirect_uri_mismatch/i.test(message)) {
+        setGoogleAuthIssue("redirect");
+        toast.error("The OAuth redirect URL needs to be added to the provider configuration.");
+      } else {
+        setGoogleAuthIssue("generic");
+        toast.error(message);
+      }
       setBusy(false);
     }
   }
@@ -205,6 +222,31 @@ function AuthPage() {
                 <GoogleMark />
                 Continue with Google
               </button>
+              {googleAuthIssue && (
+                <div role="alert" className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-left text-xs leading-relaxed text-amber-950">
+                  <p className="font-semibold">
+                    {googleAuthIssue === "missing-secret"
+                      ? "Google sign-in is missing its OAuth client secret."
+                      : googleAuthIssue === "provider-disabled"
+                        ? "Google sign-in is not enabled in Supabase."
+                        : googleAuthIssue === "redirect"
+                          ? "The Google sign-in redirect is not allowlisted."
+                          : "Google sign-in could not start."}
+                  </p>
+                  <p className="mt-1.5">
+                    {googleAuthIssue === "missing-secret"
+                      ? "In Supabase Dashboard → Authentication → Sign In / Providers → Google, add the Web OAuth Client ID and Client Secret created in Google Cloud. Store the secret in Supabase only—never in this app or GitHub."
+                      : googleAuthIssue === "provider-disabled"
+                        ? "Enable the Google provider in Supabase and save its Web OAuth Client ID and Client Secret. Email/password sign-in remains available."
+                        : googleAuthIssue === "redirect"
+                          ? "Allow the Supabase callback URI in Google Cloud and allow this app's /auth return URL in Supabase Auth URL Configuration."
+                          : "Check the Google provider configuration in Supabase. Email/password sign-in remains available."}
+                  </p>
+                  <a className="mt-2 inline-flex font-semibold underline underline-offset-2" href="/docs/AUTH_SETUP.md" target="_blank" rel="noreferrer">
+                    View setup instructions
+                  </a>
+                </div>
+              )}
               <div className="my-5 flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                 <span className="h-px flex-1 bg-border" />or use email<span className="h-px flex-1 bg-border" />
               </div>
