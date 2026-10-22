@@ -101,7 +101,7 @@ function Card({ c, lifted }: { c: (typeof categories)[number]; lifted: boolean }
       className={`group flex h-full min-h-[340px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background ${lifted ? "ring-1 ring-primary/30" : ""}`}
       aria-label={`${c.title}: ${c.tagline}`}>
       <div className="flex items-center justify-between px-5 pt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-        <span>{c.index}</span><span>{c.tagline}</span>
+        <span>{c.index}</span><span>{c.title}</span>
       </div>
       <div className="relative mx-4 mt-3 flex flex-1 items-center justify-center rounded-xl bg-secondary/60 grain">
         <img src={c.art} alt="" width={1024} height={1024} loading="lazy"
