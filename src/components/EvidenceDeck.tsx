@@ -68,22 +68,29 @@ export function EvidenceDeck() {
 
   const narrow = viewport.width < 640;
   const rowLayout = viewport.width >= 680;
+  const cinematicLayout = viewport.width >= 900 && viewport.height >= 620;
   const stageWidth = Math.max(280, Math.min(1152, viewport.width - (narrow ? 32 : 48)));
-  const cardWidth = rowLayout
-    ? (viewport.width >= 900 ? 250 : Math.min(190, (stageWidth - 36) / 4))
-    : Math.min(185, (stageWidth - 12) / 2);
-  const cardHeight = rowLayout
+  const cardWidth = cinematicLayout
+    ? 250
+    : rowLayout
+      ? Math.min(190, (stageWidth - 36) / 4)
+      : Math.min(185, (stageWidth - 12) / 2);
+  const cardHeight = cinematicLayout
     ? 380
-    : Math.min(260, Math.max(190, viewport.height * 0.3));
-  const stageHeight = rowLayout
+    : rowLayout
+      ? Math.max(190, Math.min(310, cardWidth * 1.52, viewport.height * 0.52))
+      : Math.min(260, Math.max(190, viewport.height * 0.3));
+  const stageHeight = cinematicLayout
     ? 420
-    : Math.min(560, Math.max(400, viewport.height * 0.78));
+    : rowLayout
+      ? Math.min(400, Math.max(260, viewport.height * 0.65))
+      : Math.min(560, Math.max(400, viewport.height * 0.78));
 
   const fanProgress = ease(clamp(progress / 0.5));
   const foldProgress = ease(clamp((progress - 0.6) / 0.35));
 
   const maxFanX = Math.max(0, Math.min(
-    rowLayout ? (viewport.width >= 900 ? 330 : 260) : 0,
+    rowLayout ? (cinematicLayout ? 330 : 260) : 0,
     (stageWidth - cardWidth) / 2 - 8,
   ));
   const fanX = rowLayout
