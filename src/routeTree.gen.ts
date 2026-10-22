@@ -10,12 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as Section63RouteImport } from './routes/section-63'
+import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
+import { Route as AuthenticatedCasesIndexRouteImport } from './routes/_authenticated/cases.index'
+import { Route as AuthenticatedCasesIdRouteImport } from './routes/_authenticated/cases.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MethodologyRoute = MethodologyRouteImport.update({
@@ -28,33 +42,86 @@ const Section63Route = Section63RouteImport.update({
   path: '/section-63',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCasesIndexRoute = AuthenticatedCasesIndexRouteImport.update({
+  id: '/cases/',
+  path: '/cases/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCasesIdRoute = AuthenticatedCasesIdRouteImport.update({
+  id: '/cases/$id',
+  path: '/cases/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/methodology': typeof MethodologyRoute
   '/section-63': typeof Section63Route
+  '/studio': typeof AuthenticatedStudioRoute
+  '/cases/$id': typeof AuthenticatedCasesIdRoute
+  '/cases/': typeof AuthenticatedCasesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/methodology': typeof MethodologyRoute
   '/section-63': typeof Section63Route
+  '/studio': typeof AuthenticatedStudioRoute
+  '/cases/$id': typeof AuthenticatedCasesIdRoute
+  '/cases': typeof AuthenticatedCasesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/methodology': typeof MethodologyRoute
   '/section-63': typeof Section63Route
+  '/_authenticated/studio': typeof AuthenticatedStudioRoute
+  '/_authenticated/cases/$id': typeof AuthenticatedCasesIdRoute
+  '/_authenticated/cases/': typeof AuthenticatedCasesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/methodology' | '/section-63'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/methodology'
+    | '/section-63'
+    | '/studio'
+    | '/cases/$id'
+    | '/cases/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/methodology' | '/section-63'
-  id: '__root__' | '/' | '/methodology' | '/section-63'
+  to:
+    | '/'
+    | '/auth'
+    | '/methodology'
+    | '/section-63'
+    | '/studio'
+    | '/cases/$id'
+    | '/cases'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/methodology'
+    | '/section-63'
+    | '/_authenticated/studio'
+    | '/_authenticated/cases/$id'
+    | '/_authenticated/cases/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   MethodologyRoute: typeof MethodologyRoute
   Section63Route: typeof Section63Route
 }
@@ -66,6 +133,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/methodology': {
@@ -82,11 +163,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Section63RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/studio': {
+      id: '/_authenticated/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof AuthenticatedStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cases/': {
+      id: '/_authenticated/cases/'
+      path: '/cases'
+      fullPath: '/cases/'
+      preLoaderRoute: typeof AuthenticatedCasesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cases/$id': {
+      id: '/_authenticated/cases/$id'
+      path: '/cases/$id'
+      fullPath: '/cases/$id'
+      preLoaderRoute: typeof AuthenticatedCasesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedStudioRoute: typeof AuthenticatedStudioRoute
+  AuthenticatedCasesIdRoute: typeof AuthenticatedCasesIdRoute
+  AuthenticatedCasesIndexRoute: typeof AuthenticatedCasesIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedStudioRoute: AuthenticatedStudioRoute,
+  AuthenticatedCasesIdRoute: AuthenticatedCasesIdRoute,
+  AuthenticatedCasesIndexRoute: AuthenticatedCasesIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   MethodologyRoute: MethodologyRoute,
   Section63Route: Section63Route,
 }

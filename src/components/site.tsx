@@ -13,6 +13,8 @@ export function SiteHeader() {
           </span>
         </Link>
         <nav className="flex items-center gap-6">
+          <Link to="/studio" search={{}} className={link} activeProps={{ className: "text-foreground" }}>Studio</Link>
+          <Link to="/cases" className={link} activeProps={{ className: "text-foreground" }}>Cases</Link>
           <Link to="/methodology" className={link} activeProps={{ className: "text-foreground" }}>Method</Link>
           <Link to="/section-63" className={link} activeProps={{ className: "text-foreground" }}>Section 63</Link>
           <a href="https://github.com/Kishordiu/pipertraces" target="_blank" rel="noreferrer"
