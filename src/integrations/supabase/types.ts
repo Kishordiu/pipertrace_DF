@@ -14,7 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_events: {
+        Row: {
+          case_id: string
+          created_at: string
+          detail: Json
+          event: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          detail?: Json
+          event: string
+          id?: never
+          user_id?: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          detail?: Json
+          event?: string
+          id?: never
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_events_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cases: {
+        Row: {
+          category: string
+          created_at: string
+          file_name: string
+          findings: Json
+          id: string
+          mime_type: string
+          reference_name: string | null
+          reference_path: string | null
+          reference_sha256: string | null
+          sha256: string
+          size_bytes: number
+          storage_path: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          file_name: string
+          findings?: Json
+          id?: string
+          mime_type: string
+          reference_name?: string | null
+          reference_path?: string | null
+          reference_sha256?: string | null
+          sha256: string
+          size_bytes: number
+          storage_path: string
+          title?: string
+          user_id?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          file_name?: string
+          findings?: Json
+          id?: string
+          mime_type?: string
+          reference_name?: string | null
+          reference_path?: string | null
+          reference_sha256?: string | null
+          sha256?: string
+          size_bytes?: number
+          storage_path?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
