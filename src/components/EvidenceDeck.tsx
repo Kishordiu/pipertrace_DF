@@ -69,7 +69,7 @@ export function EvidenceDeck() {
         </p>
         <div className="relative h-[420px] w-full max-w-6xl" style={{ perspective: "1600px" }}>
           {categories.map((c, i) => {
-            const f = FAN[i];
+            const f = FAN[i] ?? { x: 0, y: 0, r: 0 };
             const gx = (i - 1.5) * 270;
             const lift = active === i ? 1 : 0;
             const x = lerp(lerp(i * 6 - 9, f.x, fan), gx, fold);
