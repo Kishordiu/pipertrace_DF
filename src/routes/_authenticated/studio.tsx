@@ -6,12 +6,12 @@ import { categories } from "@/lib/categories";
 import { analyzeAudio, analyzeDocument, analyzeImage, analyzeVideo, sha256, type Category } from "@/lib/forensics";
 import { saveCase } from "@/lib/cases";
 
-type Search = { mode?: Category };
+type Search = { mode?: Category | undefined };
 const ACCEPT: Record<Category, string> = { image: "image/*", document: "image/*", video: "video/*", audio: "audio/*" };
 
 export const Route = createFileRoute("/_authenticated/studio")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    mode: ["image", "document", "video", "audio"].includes(s.mode as string) ? (s.mode as Category) : undefined,
+    mode: ["image", "document", "video", "audio"].includes(s["mode"] as string) ? (s["mode"] as Category) : undefined,
   }),
   head: () => ({ meta: [{ title: "Studio — PiperTrace" }, { name: "description", content: "Analyse media locally." }] }),
   component: Studio,
@@ -27,7 +27,7 @@ function Studio() {
 
   async function run() {
     if (!file) return;
-    if (cat === "document" && !ref) return toast.error("Add the reference/original document to compare against.");
+    if (cat === "document" && !ref) { toast.error("Add the reference/original document to compare against."); return; }
     try {
       setStep("Computing SHA-256 of the original…");
       const sha = await sha256(file);

@@ -16,7 +16,7 @@ export async function saveCase(input: {
   title: string;
   file: File;
   sha: string;
-  reference?: { file: File; sha: string };
+  reference?: { file: File; sha: string } | undefined;
   result: AnalysisResult;
   maps: MapImage[];
 }) {
@@ -27,12 +27,12 @@ export async function saveCase(input: {
   const base = `${uid}/${id}`;
   const originalPath = `${base}/original.${ext(input.file.name)}`;
 
-  const up = await supabase.storage.from("evidence").upload(originalPath, input.file, { contentType: input.file.type || undefined });
+  const up = await supabase.storage.from("evidence").upload(originalPath, input.file, { contentType: input.file.type || "application/octet-stream" });
   if (up.error) throw up.error;
   let refPath: string | null = null;
   if (input.reference) {
     refPath = `${base}/reference.${ext(input.reference.file.name)}`;
-    const r = await supabase.storage.from("evidence").upload(refPath, input.reference.file, { contentType: input.reference.file.type || undefined });
+    const r = await supabase.storage.from("evidence").upload(refPath, input.reference.file, { contentType: input.reference.file.type || "application/octet-stream" });
     if (r.error) throw r.error;
   }
   const stored: StoredMap[] = [];

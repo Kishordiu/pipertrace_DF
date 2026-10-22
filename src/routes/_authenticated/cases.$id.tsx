@@ -76,12 +76,12 @@ function CaseDetail() {
       <section className="mt-8 grid gap-6 md:grid-cols-2">
         {c.category !== "audio" && c.category !== "video" && (
           <Figure label="Original" caption={mask ? "Masked by default to protect personal details." : c.file_name}>
-            <img src={urls.original} alt="Original evidence" className={`w-full rounded-lg ${mask ? "blur-xl" : ""}`} />
+            <img src={urls["original"]} alt="Original evidence" className={`w-full rounded-lg ${mask ? "blur-xl" : ""}`} />
             {c.category === "document" && <button onClick={() => setReveal(!reveal)} className="mt-2 text-xs text-primary print:hidden">{reveal ? "Mask" : "Reveal"}</button>}
           </Figure>
         )}
-        {c.category === "video" && <Figure label="Original" caption={c.file_name}><video src={urls.original} controls className="w-full rounded-lg bg-ink" /></Figure>}
-        {c.category === "audio" && <Figure label="Original" caption={c.file_name}><audio src={urls.original} controls className="w-full" /></Figure>}
+        {c.category === "video" && <Figure label="Original" caption={c.file_name}><video src={urls["original"]} controls className="w-full rounded-lg bg-ink" /></Figure>}
+        {c.category === "audio" && <Figure label="Original" caption={c.file_name}><audio src={urls["original"]} controls className="w-full" /></Figure>}
         {f.maps.map((m) => (
           <Figure key={m.key} label={m.label} caption={m.caption}>
             <img src={urls[m.key]} alt={m.label} className={`w-full rounded-lg bg-ink ${mask && m.key === "diff" ? "blur-xl" : ""}`} />
