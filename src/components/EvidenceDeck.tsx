@@ -2,114 +2,235 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { categories } from "@/lib/categories";
 
-// Stack -> fan -> fold into grid, driven by scroll progress of a tall pinned section.
-const FAN = [
-  { x: -330, y: 30, r: -14 },
-  { x: -110, y: -10, r: -5 },
-  { x: 110, y: -10, r: 5 },
-  { x: 330, y: 30, r: 14 },
-];
+type Viewport = { width: number; height: number };
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const clamp = (t: number) => Math.min(1, Math.max(0, t));
 
+/**
+ * Evidence Deck
+ * The interaction remains scroll-driven on phones as well as desktop:
+ * stacked -> fan -> a category layout that fits the available viewport.
+ * Narrow screens finish in a 2x2 grid; wider screens finish in a single row.
+ */
 export function EvidenceDeck() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [p, setP] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [progress, setProgress] = useState(0);
   const [active, setActive] = useState<number | null>(null);
-  const [wide, setWide] = useState(true);
+  const [viewport, setViewport] = useState<Viewport>({ width: 1024, height: 768 });
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const mq = window.matchMedia("(min-width: 900px)");
-    const onMq = () => setWide(mq.matches);
-    onMq();
-    mq.addEventListener("change", onMq);
-    if (reduce) { setP(0.5); return () => mq.removeEventListener("change", onMq); }
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const el = ref.current;
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        const total = r.height - window.innerHeight;
-        setP(clamp(-r.top / total));
-      });
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncMotion = () => setReducedMotion(motionQuery.matches);
+    const syncViewport = () => setViewport({ width: window.innerWidth, height: window.innerHeight });
+
+    syncMotion();
+    syncViewport();
+    motionQuery.addEventListener("change", syncMotion);
+    window.addEventListener("resize", syncViewport, { passive: true });
+
     return () => {
-      cancelAnimationFrame(raf);
-      mq.removeEventListener("change", onMq);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      motionQuery.removeEventListener("change", syncMotion);
+      window.removeEventListener("resize", syncViewport);
     };
   }, []);
 
-  if (!wide) {
-    return (
-      <section className="mx-auto grid max-w-6xl gap-5 px-6 py-16 sm:grid-cols-2">
-        {categories.map((c) => <Card key={c.id} c={c} lifted={false} />)}
-      </section>
-    );
-  }
+  useEffect(() => {
+    if (reducedMotion) {
+      setProgress(1);
+      return;
+    }
 
-  const fan = ease(clamp(p / 0.5));
-  const fold = ease(clamp((p - 0.6) / 0.35));
+    let raf = 0;
+    const update = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const section = sectionRef.current;
+        if (!section) return;
+        const rect = section.getBoundingClientRect();
+        const scrollableDistance = rect.height - window.innerHeight;
+        setProgress(scrollableDistance > 0 ? clamp(-rect.top / scrollableDistance) : 1);
+      });
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [reducedMotion, viewport.width, viewport.height]);
+
+  const narrow = viewport.width < 640;
+  const rowLayout = viewport.width >= 680;
+  const stageWidth = Math.max(280, Math.min(1152, viewport.width - (narrow ? 32 : 48)));
+  const cardWidth = rowLayout
+    ? (viewport.width >= 900 ? 250 : Math.min(190, (stageWidth - 36) / 4))
+    : Math.min(185, (stageWidth - 12) / 2);
+  const cardHeight = rowLayout
+    ? 380
+    : Math.min(260, Math.max(190, viewport.height * 0.3));
+  const stageHeight = rowLayout
+    ? 420
+    : Math.min(560, Math.max(400, viewport.height * 0.78));
+
+  const fanProgress = ease(clamp(progress / 0.5));
+  const foldProgress = ease(clamp((progress - 0.6) / 0.35));
+
+  const maxFanX = Math.max(0, Math.min(
+    rowLayout ? (viewport.width >= 900 ? 330 : 260) : 0,
+    (stageWidth - cardWidth) / 2 - 8,
+  ));
+  const fanX = rowLayout
+    ? [-maxFanX, -maxFanX / 3, maxFanX / 3, maxFanX]
+    : [-1.5, -0.5, 0.5, 1.5].map((n) => n * cardWidth * 0.38);
+
+  const rowSpacing = Math.max(0, (stageWidth - cardWidth - 16) / 3);
+  const gridGapX = (cardWidth + 12) / 2;
+  const gridGapY = (cardHeight + 12) / 2;
 
   return (
-    <section ref={ref} className="relative h-[260vh]" aria-label="The Evidence Deck">
-      <div className="sticky top-16 flex h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden">
-        <p className="mb-10 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground transition-opacity"
-          style={{ opacity: 1 - fold }}>
-          {fan < 0.95 ? "Scroll to open the deck" : "Four intake categories · one evidence standard"}
+    <section
+      ref={sectionRef}
+      className="relative"
+      style={{ height: rowLayout ? "260vh" : "220svh" }}
+      aria-label="The Evidence Deck"
+    >
+      <div className="sticky top-16 flex flex-col items-center justify-center overflow-hidden px-3"
+        style={{ height: "calc(100svh - 4rem)" }}>
+        <p
+          className="mb-3 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground sm:mb-6 sm:text-[11px] sm:tracking-[0.22em]"
+          style={{ opacity: 1 - foldProgress * 0.55 }}
+          aria-live="polite"
+        >
+          {reducedMotion
+            ? "Choose a forensic path"
+            : foldProgress > 0.72
+              ? (rowLayout ? "Choose a forensic path" : "Choose a category")
+              : fanProgress < 0.94
+                ? "Scroll to open the deck"
+                : "Four intake categories · one evidence standard"}
         </p>
-        <div className="relative h-[420px] w-full max-w-6xl" style={{ perspective: "1600px" }}>
-          {categories.map((c, i) => {
-            const f = FAN[i] ?? { x: 0, y: 0, r: 0 };
-            const gx = (i - 1.5) * 270;
-            const lift = active === i ? 1 : 0;
-            const x = lerp(lerp(i * 6 - 9, f.x, fan), gx, fold);
-            const y = lerp(lerp(i * -6, f.y, fan), 0, fold) - lift * 18;
-            const r = lerp(lerp((i - 1.5) * 2, f.r, fan), 0, fold);
-            const rx = lerp(lerp(18, 6, fan), 0, fold);
+
+        <div
+          className="relative mx-auto w-full max-w-6xl"
+          style={{ height: stageHeight + "px", perspective: "1600px" }}
+        >
+          {categories.map((category, index) => {
+            const stackX = (index - 1.5) * 3;
+            const stackY = index * -3;
+            const stackRotation = (index - 1.5) * 1.4;
+            const fanY = rowLayout
+              ? [30, -10, -10, 30][index] ?? 0
+              : [12, -6, -6, 12][index] ?? 0;
+            const fanRotation = [-14, -5, 5, 14][index] ?? 0;
+
+            let targetX: number;
+            let targetY: number;
+            if (rowLayout) {
+              targetX = (index - 1.5) * rowSpacing;
+              targetY = 0;
+            } else {
+              const column = index % 2;
+              const row = Math.floor(index / 2);
+              targetX = column === 0 ? -gridGapX : gridGapX;
+              targetY = row === 0 ? -gridGapY : gridGapY;
+            }
+
+            const x = lerp(lerp(stackX, fanX[index] ?? 0, fanProgress), targetX, foldProgress);
+            const y = lerp(lerp(stackY, fanY, fanProgress), targetY, foldProgress) - (active === index ? 10 : 0);
+            const rotation = lerp(lerp(stackRotation, fanRotation, fanProgress), 0, foldProgress);
+            const tiltX = lerp(lerp(12, rowLayout ? 5 : 3, fanProgress), 0, foldProgress);
+            const isActive = active === index;
+
             return (
-              <div key={c.id}
-                className="absolute left-1/2 top-1/2 h-[380px] w-[250px] transition-transform duration-300 ease-out will-change-transform"
+              <div
+                key={category.id}
+                className="absolute left-1/2 top-1/2 will-change-transform"
                 style={{
-                  transform: `translate(-50%,-50%) translate3d(${x}px,${y}px,${lift * 40}px) rotateX(${rx}deg) rotateZ(${r}deg)`,
-                  zIndex: active === i ? 10 : i,
+                  width: cardWidth,
+                  height: cardHeight,
+                  transform: "translate(-50%, -50%) translate3d(" + x + "px, " + y + "px, " + (isActive ? 34 : index * 2) + "px) rotateX(" + tiltX + "deg) rotateZ(" + rotation + "deg)",
+                  transformStyle: "preserve-3d",
+                  zIndex: isActive ? 20 : index + 1,
+                  transition: isActive ? "transform 180ms ease-out" : "none",
                 }}
-                onMouseEnter={() => setActive(i)} onMouseLeave={() => setActive(null)}
-                onFocus={() => setActive(i)} onBlur={() => setActive(null)}>
-                <Card c={c} lifted={active === i} />
+                onMouseEnter={() => setActive(index)}
+                onMouseLeave={() => setActive(null)}
+                onFocus={() => setActive(index)}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setActive(null);
+                }}
+              >
+                <Card
+                  c={category}
+                  lifted={isActive}
+                  compact={!rowLayout || viewport.width < 900}
+                  narrow={narrow}
+                />
               </div>
             );
           })}
         </div>
+
+        <p className="mt-3 max-w-xl text-center text-[10px] leading-relaxed text-muted-foreground/80 sm:mt-5 sm:text-xs">
+          Select a category to open its dedicated analysis workflow.
+        </p>
       </div>
     </section>
   );
 }
 
-function Card({ c, lifted }: { c: (typeof categories)[number]; lifted: boolean }) {
+function Card({
+  c,
+  lifted,
+  compact,
+  narrow,
+}: {
+  c: (typeof categories)[number];
+  lifted: boolean;
+  compact: boolean;
+  narrow: boolean;
+}) {
+  const artSize = narrow ? "h-16 w-16" : compact ? "h-24 w-24" : "h-32 w-32 xl:h-40 xl:w-40";
   return (
-    <Link to="/studio" search={{ mode: c.id }}
-      className={`group flex h-full min-h-[340px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background ${lifted ? "ring-1 ring-primary/30" : ""}`}
-      aria-label={`${c.title}: ${c.tagline}`}>
-      <div className="flex items-center justify-between px-5 pt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-        <span>{c.index}</span><span>{c.title}</span>
+    <Link
+      to="/studio"
+      search={{ mode: c.id }}
+      className={[
+        "group flex h-full min-h-0 flex-col overflow-hidden rounded-[20px] border border-border bg-card shadow-card outline-none",
+        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background",
+        "transition-[box-shadow,border-color] duration-200",
+        lifted ? "border-primary/50 shadow-xl ring-1 ring-primary/20" : "hover:border-primary/30",
+      ].join(" ")}
+      aria-label={c.title + ": " + c.tagline}
+    >
+      <div className="flex items-center justify-between gap-2 px-3 pt-3 font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground sm:px-5 sm:pt-5 sm:text-[10px] sm:tracking-[0.2em]">
+        <span>{c.index}</span>
+        <span className="truncate text-right">{c.tagline}</span>
       </div>
-      <div className="relative mx-4 mt-3 flex flex-1 items-center justify-center rounded-xl bg-secondary/60 grain">
-        <img src={c.art} alt="" width={1024} height={1024} loading="lazy"
-          className="h-40 w-40 object-contain transition-transform duration-500 group-hover:scale-105" />
+      <div className="grain relative mx-3 mt-2 flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-xl bg-secondary/60 sm:mx-4 sm:mt-3">
+        <img
+          src={c.art}
+          alt=""
+          width={1024}
+          height={1024}
+          loading="lazy"
+          className={artSize + " object-contain transition-transform duration-500 group-hover:scale-[1.04]"}
+        />
       </div>
-      <div className="p-5">
-        <h3 className="font-serif text-3xl italic">{c.title}</h3>
-        <p className="mt-1 text-sm leading-snug text-muted-foreground">{c.summary}</p>
+      <div className={compact ? "p-3 sm:p-4" : "p-5"}>
+        <h3 className={compact ? "font-serif text-2xl italic leading-none sm:text-3xl" : "font-serif text-3xl italic leading-none"}>
+          {c.title}
+        </h3>
+        <p className={compact ? "mt-1.5 line-clamp-3 text-[11px] leading-snug text-muted-foreground sm:text-xs" : "mt-2 text-sm leading-snug text-muted-foreground"}>
+          {c.summary}
+        </p>
       </div>
     </Link>
   );
