@@ -16,14 +16,14 @@ The error `Unsupported provider: missing OAuth secret` comes from Supabase Auth.
 
 6. In **Authorized redirect URIs**, add the Supabase callback exactly:
 
-   `https://ilrvvpqqzvmgljebosko.supabase.co/auth/v1/callback`
+   `https://amcxylppnpchwpuzaxec.supabase.co/auth/v1/callback`
 
 7. Save the OAuth client and copy its Client ID and Client Secret. Do not paste the Client Secret in a chat, commit it to GitHub, or put it in a `VITE_*` environment variable.
 
 ## 2. Configure the Google provider in Supabase
 
 1. Open the Supabase dashboard: https://supabase.com/dashboard
-2. Select the PiperTrace project with reference `ilrvvpqqzvmgljebosko`.
+2. Select the PiperTrace project with reference `amcxylppnpchwpuzaxec`.
 3. Go to **Authentication → Sign In / Providers → Google** (the menu label may vary slightly).
 4. Enable Google.
 5. Paste the Google **Client ID** into the Client ID field.
