@@ -324,7 +324,7 @@ function CaseDetail() {
           <div className="mt-6">
             <h3 className="bsa-section-heading font-serif text-2xl italic">Part A — to be completed by the party</h3>
             <p className="bsa-note mt-1 text-xs leading-5 text-muted-foreground">Enter the party’s own details. Do not use the logged-in account name unless that person is the responsible party.</p>
-            <p className="mt-3 text-sm leading-6">I, <strong>{certificate.partyName || "NOT PROVIDED — party name required"}</strong>, son/daughter/spouse of <strong>{certificate.partyRelation || "NOT PROVIDED"}</strong>, residing/employed at <strong>{certificate.partyAddress || "NOT PROVIDED"}</strong>, state that I have produced the electronic record/output described below from this digital-record source:</p>
+            <p className="mt-3 text-sm leading-6">I, <strong>{certificate.partyName || "NOT PROVIDED — party name required"}</strong>, son/daughter/spouse of <strong>{certificate.partyRelation || "NOT PROVIDED"}</strong>, residing/employed at <strong>{certificate.partyAddress || "NOT PROVIDED"}</strong>, do hereby solemnly affirm and sincerely state and submit as follows. I have produced the electronic record/output of the digital record from this device/digital-record source:</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <CertificateSelect label="Device / digital-record source" value={certificate.partySource} onChange={(v) => setCertificateField("partySource", v)} options={["Computer / Storage Media", "DVR", "Mobile", "Flash Drive", "CD/DVD", "Server", "Cloud", "Other"]} />
               <CertificateField label="Other source detail (if applicable)" value={certificate.partyOtherSource} onChange={(v) => setCertificateField("partyOtherSource", v)} />
@@ -345,7 +345,7 @@ function CaseDetail() {
             </div>
             <div className="mt-4 space-y-3">
               <CertificateCheck label="I confirm that this device/source was under my lawful control for regularly creating, storing, or processing information for a regularly carried-on activity." checked={certificate.lawfulControlConfirmed} onChange={(v) => setCertificateField("lawfulControlConfirmed", v)} />
-              <CertificateCheck label="I confirm that the applicable activity was regularly performed using this device/source, information was regularly fed in the ordinary course of that activity, and I have considered the statutory device-operation conditions before making this declaration." checked={certificate.normalCourseConfirmed} onChange={(v) => setCertificateField("normalCourseConfirmed", v)} />
+              <CertificateCheck label="I confirm that the relevant information was regularly fed into the device/source in the ordinary course of the activity; the record reproduces or is derived from such information; and the device operated properly during the material period. If it was not working properly or was out of operation, that did not affect the record or the accuracy of its contents." checked={certificate.normalCourseConfirmed} onChange={(v) => setCertificateField("normalCourseConfirmed", v)} />
               <label className="bsa-field block">
                 <span className="text-xs font-semibold">Device condition during relevant period</span>
                 <select value={certificate.deviceWorking} onChange={(e) => setCertificateField("deviceWorking", e.target.value)} className="mt-1.5 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm">
@@ -382,7 +382,7 @@ function CaseDetail() {
           <div className="mt-8 border-t border-border pt-6">
             <h3 className="bsa-section-heading font-serif text-2xl italic">Part B — to be completed by the expert</h3>
             <p className="bsa-note mt-1 text-xs leading-5 text-muted-foreground">This part is deliberately not auto-signed. The actual expert must enter their own identity, qualifications/designation, source/device details and complete the required declaration.</p>
-            <p className="mt-3 text-sm leading-6">I, <strong>{certificate.expertName || "NOT PROVIDED — expert name required"}</strong>, son/daughter/spouse of <strong>{certificate.expertRelation || "NOT PROVIDED"}</strong>, residing/employed at <strong>{certificate.expertAddress || "NOT PROVIDED"}</strong>, solemnly affirm and state as follows. I have examined or been provided the electronic record/output identified below from the following device/source:</p>
+            <p className="mt-3 text-sm leading-6">I, <strong>{certificate.expertName || "NOT PROVIDED — expert name required"}</strong>, son/daughter/spouse of <strong>{certificate.expertRelation || "NOT PROVIDED"}</strong>, residing/employed at <strong>{certificate.expertAddress || "NOT PROVIDED"}</strong>, do hereby solemnly affirm and sincerely state and submit as follows. The produced electronic record/output of the digital record is obtained from the following device/digital-record source:</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <CertificateField label="Expert full name" value={certificate.expertName} onChange={(v) => setCertificateField("expertName", v)} />
               <CertificateField label="Son/daughter/spouse of" value={certificate.expertRelation} onChange={(v) => setCertificateField("expertRelation", v)} />
