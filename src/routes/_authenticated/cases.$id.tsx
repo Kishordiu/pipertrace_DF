@@ -159,7 +159,7 @@ function CaseDetail() {
         </div>
         <div className="mt-4 rounded-xl border border-border bg-[#f7fafb] p-3">
           <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">SHA-256 integrity fingerprint</p>
-          <p className="bsa-hash mt-1 break-all font-mono text-xs leading-5">{c.sha256}</p>
+          <p className="bsa-hash mt-1 break-words font-mono text-xs leading-5">{c.sha256}</p>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <span className="rounded-full border border-border px-3 py-1 text-xs">Input quality: {f.quality.level}</span>
@@ -171,7 +171,7 @@ function CaseDetail() {
         <div>
           <Eyebrow>{c.category} · measured signal inspection · {f.engine}</Eyebrow>
           <h2 className="mt-2 text-2xl font-medium tracking-tight">{c.title}</h2>
-          <p className="mt-2 break-all font-mono text-xs text-muted-foreground">SHA-256 {c.sha256}</p>
+          <p className="mt-2 break-words font-mono text-xs text-muted-foreground">SHA-256 {c.sha256}</p>
         </div>
         <div className="flex gap-2 print:hidden">
           <button onClick={verify} className="rounded-full border border-border px-4 py-2 text-sm hover:bg-muted">Verify hash</button>
