@@ -158,6 +158,45 @@ export async function analyzeImage(file: File): Promise<{ result: AnalysisResult
         }
       tileMeans.push(s / k);
     }
+
+  // Identify the spatial tiles with the largest ELA differences for review.
+  // These are review coordinates, not an edit classifier or a fraud verdict.
+  const gridCols = Math.ceil(w / tile);
+  const gridRows = Math.ceil(h / tile);
+  const cutoff = percentile(tileMeans, 95);
+  const hot = tileMeans.map((v) => v > cutoff ? 1 : 0);
+  const seenTiles = new Uint8Array(hot.length);
+  const elaRegions: Region[] = [];
+  for (let i = 0; i < hot.length; i++) {
+    if (!hot[i] || seenTiles[i]) continue;
+    const stack = [i];
+    seenTiles[i] = 1;
+    let minx = Infinity, miny = Infinity, maxx = -1, maxy = -1, sum = 0, count = 0;
+    while (stack.length) {
+      const j = stack.pop()!;
+      const gx = j % gridCols;
+      const gy = Math.floor(j / gridCols);
+      minx = Math.min(minx, gx); miny = Math.min(miny, gy);
+      maxx = Math.max(maxx, gx); maxy = Math.max(maxy, gy);
+      sum += tileMeans[j]!;
+      count++;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        const nx = gx + dx, ny = gy + dy;
+        if (nx < 0 || ny < 0 || nx >= gridCols || ny >= gridRows) continue;
+        const next = ny * gridCols + nx;
+        if (hot[next] && !seenTiles[next]) { seenTiles[next] = 1; stack.push(next); }
+      }
+    }
+    const sx = bmp.width / w, sy = bmp.height / h;
+    const x = Math.round(minx * tile * sx);
+    const y = Math.round(miny * tile * sy);
+    const right = Math.min(bmp.width, Math.round(Math.min(w, (maxx + 1) * tile) * sx));
+    const bottom = Math.min(bmp.height, Math.round(Math.min(h, (maxy + 1) * tile) * sy));
+    elaRegions.push({ x, y, w: Math.max(1, right - x), h: Math.max(1, bottom - y), changed: round(sum / Math.max(1, count), 2) });
+  }
+  elaRegions.sort((a, b) => b.changed - a.changed);
+  const reviewRegions = elaRegions.slice(0, 12);
+
   const tMean = tileMeans.reduce((a, b) => a + b, 0) / tileMeans.length;
   const tStd = Math.sqrt(tileMeans.reduce((a, b) => a + (b - tMean) ** 2, 0) / tileMeans.length);
 
@@ -180,6 +219,7 @@ export async function analyzeImage(file: File): Promise<{ result: AnalysisResult
       kind: "signal-inspection",
       quality: { level, notes },
       dims: { width: bmp.width, height: bmp.height },
+      regions: reviewRegions,
       signals: [
         { key: "resolution", label: "Resolution", value: `${bmp.width} × ${bmp.height}`, method: "Decoded pixel dimensions" },
         { key: "megapixels", label: "Megapixels", value: round(mp), unit: "MP", method: "width × height / 10⁶" },
