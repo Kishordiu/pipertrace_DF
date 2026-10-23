@@ -137,6 +137,8 @@
   .report-visuals {
     display: block !important;
     margin-top: 5mm !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
   }
   .report-figure {
     margin: 0 0 5mm !important;
@@ -155,8 +157,6 @@
     max-height: 125mm !important;
     object-fit: contain !important;
     border-radius: 1mm !important;
-    filter: none !important;
-    blur: 0 !important;
   }
   .report-figure-ela { display: none !important; }
   .report-chart { display: none !important; }
@@ -164,7 +164,7 @@
     break-inside: avoid;
     page-break-inside: avoid;
   }
-  .bsa-panel { margin-top: 5mm !important; padding: 5mm !important; background: #fff !important; color: #17232a !important; border: 0.3mm solid #c8d4d9 !important; }
+  .bsa-panel { margin-top: 5mm !important; padding: 5mm !important; background: #fff !important; color: #17232a !important; border: 0.3mm solid #c8d4d9 !important; break-inside: auto !important; page-break-inside: auto !important; }
   .bsa-field input,
   .bsa-field select,
   .bsa-field textarea,
@@ -195,6 +195,8 @@
   .report-page-break {
     break-before: page;
     page-break-before: always;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
   }
   a { color: #17232a !important; text-decoration: none !important; }
 }
