@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" width="100%" height="auto">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080F17" />
+      <stop offset="50%" stop-color="#0F1D2B" />
+      <stop offset="100%" stop-color="#060A0F" />
+    </linearGradient>
+
+    <linearGradient id="sheen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#35C8D5" stop-opacity="0" />
+      <stop offset="50%" stop-color="#35C8D5" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#35C8D5" stop-opacity="0" />
+    </linearGradient>
+
+    <radialGradient id="coreGlow" cx="78%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#35C8D5" stop-opacity="0.32" />
+      <stop offset="45%" stop-color="#4E96C8" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#080F17" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="ambientTeal" cx="15%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#2D424F" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#080F17" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Clay Plate Border Gradient -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4A6578" stop-opacity="0.6" />
+      <stop offset="40%" stop-color="#233544" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#35C8D5" stop-opacity="0.5" />
+    </linearGradient>
+
+    <!-- Animations -->
+    <style>
+      @keyframes orbit1 {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes orbit2 {
+        0% { transform: rotate(360deg) scaleY(0.42); }
+        100% { transform: rotate(0deg) scaleY(0.42); }
+      }
+      @keyframes orbit3 {
+        0% { transform: rotate(45deg); }
+        50% { transform: rotate(225deg); }
+        100% { transform: rotate(405deg); }
+      }
+      @keyframes pulseGlow {
+        0%, 100% { opacity: 0.35; transform: scale(1); }
+        50% { opacity: 0.65; transform: scale(1.08); }
+      }
+      @keyframes sparkFloat1 {
+        0% { transform: translate(0, 0); opacity: 0.2; }
+        50% { transform: translate(-15px, -18px); opacity: 0.9; }
+        100% { transform: translate(0, 0); opacity: 0.2; }
+      }
+      @keyframes sparkFloat2 {
+        0% { transform: translate(0, 0); opacity: 0.3; }
+        50% { transform: translate(20px, -24px); opacity: 0.85; }
+        100% { transform: translate(0, 0); opacity: 0.3; }
+      }
+      @keyframes sheenSweep {
+        0% { transform: translateX(-100%); }
+        50%, 100% { transform: translateX(100%); }
+      }
+
+      .orbit-ring-1 {
+        transform-origin: 750px 140px;
+        animation: orbit1 24s linear infinite;
+      }
+      .orbit-ring-2 {
+        transform-origin: 750px 140px;
+        animation: orbit2 18s linear infinite;
+      }
+      .orbit-ring-3 {
+        transform-origin: 750px 140px;
+        animation: orbit3 32s ease-in-out infinite;
+      }
+      .glow-pulse {
+        transform-origin: 750px 140px;
+        animation: pulseGlow 5s ease-in-out infinite;
+      }
+      .spark-1 { animation: sparkFloat1 6s ease-in-out infinite; }
+      .spark-2 { animation: sparkFloat2 8s ease-in-out infinite; }
+      .sheen-line { animation: sheenSweep 8s ease-in-out infinite; }
+
+      .title-text {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Geist Sans", sans-serif;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        fill: #F1F6F9;
+      }
+      .serif-italic {
+        font-family: "Instrument Serif", Georgia, "Times New Roman", serif;
+        font-style: italic;
+      }
+      .mono-chip {
+        font-family: "JetBrains Mono", Consolas, monospace;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        font-size: 11px;
+      }
+    </style>
+  </defs>
+
+  <!-- Background Shell -->
+  <rect width="960" height="280" rx="20" fill="url(#bgGrad)" />
+  <rect width="960" height="280" rx="20" fill="url(#ambientTeal)" />
+  <rect width="960" height="280" rx="20" fill="url(#coreGlow)" />
+  
+  <!-- Outer Slate-Clay Border -->
+  <rect x="1.5" y="1.5" width="957" height="277" rx="18.5" fill="none" stroke="url(#borderGrad)" stroke-width="1.5" />
+
+  <!-- Subtle Top Specular Glass Lip -->
+  <path d="M 22 4 L 938 4" stroke="#8BE5E0" stroke-opacity="0.25" stroke-width="1.5" stroke-linecap="round" />
+
+  <!-- Right-side Orbital Core Simulation (DIU Foundry Storybook ThreeJS Torus/Sparks) -->
+  <g class="glow-pulse">
+    <circle cx="750" cy="140" r="70" fill="#35C8D5" opacity="0.1" filter="blur(20px)" />
+  </g>
+
+  <!-- Orbital Rings -->
+  <g class="orbit-ring-1">
+    <ellipse cx="750" cy="140" rx="95" ry="42" fill="none" stroke="#35C8D5" stroke-width="1.2" stroke-dasharray="8 6" opacity="0.65" />
+    <circle cx="845" cy="140" r="3.5" fill="#EAF8F8" />
+  </g>
+
+  <g class="orbit-ring-2">
+    <ellipse cx="750" cy="140" rx="115" ry="50" fill="none" stroke="#4E96C8" stroke-width="1" stroke-dasharray="4 8" opacity="0.45" />
+    <circle cx="635" cy="140" r="2.5" fill="#35C8D5" />
+  </g>
+
+  <g class="orbit-ring-3">
+    <ellipse cx="750" cy="140" rx="80" ry="78" fill="none" stroke="#6AB1BD" stroke-width="0.8" stroke-dasharray="3 5" opacity="0.35" />
+  </g>
+
+  <!-- Center Core Beacon -->
+  <circle cx="750" cy="140" r="14" fill="#0A1826" stroke="#35C8D5" stroke-width="1.5" />
+  <circle cx="750" cy="140" r="5" fill="#EAF8F8" />
+
+  <!-- Shimmering Spark Particles -->
+  <g class="spark-1">
+    <circle cx="700" cy="95" r="2" fill="#35C8D5" opacity="0.8" />
+    <circle cx="810" cy="180" r="1.8" fill="#FFFFFF" opacity="0.75" />
+    <circle cx="780" cy="80" r="1.5" fill="#4E96C8" opacity="0.6" />
+  </g>
+  <g class="spark-2">
+    <circle cx="720" cy="190" r="2.2" fill="#8BE5E0" opacity="0.7" />
+    <circle cx="820" cy="105" r="1.5" fill="#35C8D5" opacity="0.85" />
+    <circle cx="675" cy="145" r="1.8" fill="#FFFFFF" opacity="0.5" />
+  </g>
+
+  <!-- Left Side Content: Brand Badge, Title, Tagline -->
+  <g transform="translate(48, 48)">
+    <!-- Category Pill -->
+    <rect x="0" y="0" width="168" height="26" rx="13" fill="#152636" stroke="#2D465C" stroke-width="1" />
+    <circle cx="13" cy="13" r="3.5" fill="#35C8D5" />
+    <text x="24" y="17" fill="#8BE5E0" class="mono-chip">FORENSIC MEDIA</text>
+
+    <!-- Main Title -->
+    <text x="0" y="72" class="title-text" font-size="44">PiperTrace</text>
+
+    <!-- Tagline / Mission -->
+    <text x="0" y="112" fill="#9FB5C4" font-size="16" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="400">
+      Multimodal media-forensics workspace for evidentiary integrity.
+    </text>
+
+    <!-- Provenance Studio Stamp -->
+    <g transform="translate(0, 150)">
+      <text x="0" y="0" fill="#587385" class="mono-chip">DIU FOUNDRY · RESEARCH → BUILD → TEST → SHIP</text>
+    </g>
+  </g>
+</svg>
