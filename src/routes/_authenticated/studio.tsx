@@ -54,6 +54,15 @@ function Studio() {
       <main className="mx-auto max-w-6xl px-6 py-14">
         <Eyebrow>Studio</Eyebrow>
         <h1 className="mt-3 text-4xl font-medium tracking-tight">Open a <span className="font-serif font-normal italic">new case</span></h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+          {cat === "document"
+            ? "Comparison mode: upload the questioned document and a trusted, verified original. PiperTrace will report measurable difference regions and their page coordinates. Resizing, skew, glare, scan quality, and compression can also cause differences."
+            : cat === "image"
+              ? "Single-image screening: ELA highlights areas with higher JPEG re-save differences, but cannot name an edited field or prove manipulation. For specific changes between two document copies, choose Document and provide a trusted original."
+              : cat === "video"
+                ? "Video signal inspection reports sampled frames and timestamps for review. It is not a trained deepfake verdict."
+                : "Audio signal inspection reports levels and frequency patterns for review. It is not a trained voice-clone verdict."}
+        </p>
         <div className="mt-8 grid gap-3 sm:grid-cols-4" role="radiogroup" aria-label="Category">
           {categories.map((c) => (
             <button key={c.id} role="radio" aria-checked={cat === c.id} onClick={() => { setCat(c.id); setFile(null); setRef(null); }}
