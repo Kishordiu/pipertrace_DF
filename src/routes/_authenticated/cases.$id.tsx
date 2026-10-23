@@ -38,6 +38,17 @@ function CertificateField({ label, value, onChange, placeholder = "" }: { label:
     <span className="bsa-print-value hidden mt-1 text-sm">{value.trim() || "NOT PROVIDED — complete before signing"}</span>
   </label>;
 }
+function CertificateSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: string[] }) {
+  return <label className="bsa-field block min-w-0">
+    <span className="block text-xs font-semibold text-foreground">{label}</span>
+    <select value={value} onChange={(e) => onChange(e.target.value)} className="mt-1.5 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground">
+      <option value="">Select the applicable source type…</option>
+      {options.map((option) => <option key={option} value={option}>{option}</option>)}
+    </select>
+    <span className="bsa-print-value hidden mt-1 text-sm">{value || "NOT PROVIDED — select before signing"}</span>
+  </label>;
+}
+
 function CertificateCheck({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
   return <label className="bsa-checkbox flex items-start gap-2 text-sm leading-6">
     <input className="mt-1 shrink-0" type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
@@ -103,6 +114,12 @@ function CaseDetail() {
     navigate({ to: "/cases" });
   }
   const mask = c.category === "document" && !reveal;
+  const visualReviewRegions = c.category === "image" && f.dims
+    ? (f.regions ?? [])
+        .filter((region) => region.w * region.h >= f.dims!.width * f.dims!.height * 0.0015)
+        .sort((a, b) => (b.w * b.h) - (a.w * a.h))
+        .slice(0, 6)
+    : [];
 
   return (
     <Shell>
@@ -129,7 +146,7 @@ function CaseDetail() {
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <span className="rounded-full border border-border px-3 py-1 text-xs">Input quality: {f.quality.level}</span>
-          {c.category === "image" && <span className="rounded-full border border-[#e6b3ac] bg-[#fff4f2] px-3 py-1 text-xs text-[#8b2920]">{f.regions?.length ?? 0} visual review areas</span>}
+          {c.category === "image" && <span className="rounded-full border border-[#e6b3ac] bg-[#fff4f2] px-3 py-1 text-xs text-[#8b2920]">{visualReviewRegions.length} boxed review areas</span>}
           {c.category === "document" && <span className="rounded-full border border-[#e6b3ac] bg-[#fff4f2] px-3 py-1 text-xs text-[#8b2920]">{f.regions?.length ?? 0} differing regions</span>}
         </div>
       </section>
@@ -174,9 +191,9 @@ function CaseDetail() {
               return `${changed}% of aligned pixels crossed the configured brightness-difference threshold. The analysis grouped them into ${count} connected region(s). These are pixel-level differences, not an automated identification of changed text fields.`;
             })()}</p>
             <p><strong>Where to look:</strong> Coordinates below are measured from the top-left corner of the uploaded evidence image (x = from left, y = from top). Width and height describe each rectangular area in pixels. Open the Difference Overlay to see the highlighted locations.</p>
-            {f.dims && f.regions && f.regions.length > 0 ? (
+            {f.dims && visualReviewRegions.length > 0 ? (
               <ol className="list-decimal space-y-2 pl-5">
-                {f.regions.slice(0, 8).map((r, i) => {
+                {visualReviewRegions.map((r, i) => {
                   const cx = r.x + r.w / 2;
                   const cy = r.y + r.h / 2;
                   const horizontal = cx < f.dims!.width / 3 ? "left" : cx > (2 * f.dims!.width) / 3 ? "right" : "center";
@@ -206,13 +223,29 @@ function CaseDetail() {
         )}
         {c.category !== "audio" && c.category !== "video" && (
           <Figure label={c.category === "document" ? "Questioned document" : "Original image"} caption={mask ? "Masked by default to protect personal details." : c.file_name}>
-            <img src={urls["original"]} alt={c.category === "document" ? "Questioned document" : "Original evidence"} className={`w-full rounded-lg ${mask ? "blur-xl" : ""}`} />
+            <div className="report-image-evidence relative w-full">
+              <img src={urls["original"]} alt={c.category === "document" ? "Questioned document" : "Original evidence"} className={`block w-full rounded-lg ${mask ? "blur-xl" : ""}`} />
+              {c.category === "image" && f.dims && visualReviewRegions.length > 0 && (
+                <svg viewBox={`0 0 ${f.dims.width} ${f.dims.height}`} preserveAspectRatio="none" aria-label="Numbered areas to review" className="pointer-events-none absolute inset-0 h-full w-full">
+                  {visualReviewRegions.map((region, index) => {
+                    const labelH = f.dims!.width * 0.045;
+                    const labelW = f.dims!.width * 0.075;
+                    const labelY = Math.max(0, region.y - labelH);
+                    return <g key={index}>
+                      <rect x={region.x} y={region.y} width={region.w} height={region.h} fill="rgba(224,45,45,0.08)" stroke="#e02d2d" strokeWidth={Math.max(2, f.dims!.width / 300)} />
+                      <rect x={region.x} y={labelY} width={labelW} height={labelH} fill="#e02d2d" />
+                      <text x={region.x + labelW * 0.12} y={labelY + labelH * 0.72} fill="#ffffff" fontSize={labelH * 0.7} fontWeight="700">R{index + 1}</text>
+                    </g>;
+                  })}
+                </svg>
+              )}
+            </div>
             {c.category === "document" && <button onClick={() => setReveal(!reveal)} className="mt-2 text-xs text-primary print:hidden">{reveal ? "Mask" : "Reveal"} both document images</button>}
           </Figure>
         )}
         {c.category === "video" && <Figure label="Original" caption={c.file_name}><video src={urls["original"]} controls className="w-full rounded-lg bg-ink" /></Figure>}
         {c.category === "audio" && <Figure label="Original" caption={c.file_name}><audio src={urls["original"]} controls className="w-full" /></Figure>}
-        {f.maps.map((m) => (
+        {f.maps.filter((m) => m.key !== "review-regions").map((m) => (
           <Figure key={m.key} label={m.label} caption={m.caption} variant={m.key === "ela" ? "report-figure-ela" : ""}>
             <img src={urls[m.key]} alt={m.label} className={`w-full rounded-lg bg-ink ${mask && m.key === "diff" ? "blur-xl" : ""}`} />
           </Figure>
@@ -265,6 +298,19 @@ function CaseDetail() {
         </div>
       </section>
 
+      <section className="report-block mt-7 rounded-xl border border-border bg-white p-5">
+        <h2 className="font-serif text-2xl italic">Evidence handling log</h2>
+        <p className="report-muted mt-1 text-xs">Times are displayed in India Standard Time (IST).</p>
+        <ol className="mt-4 space-y-3 border-l border-border pl-4">
+          {ev.map((event) => (
+            <li key={event.id} className="break-words">
+              <p className="font-mono text-xs text-muted-foreground">{formatIst(event.created_at)}</p>
+              <p className="mt-0.5 text-sm capitalize">{event.event.replace(/_/g, " ")}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <section className="report-page-break report-block mt-7">
         <div className="bsa-panel rounded-2xl border border-border bg-white p-6">
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">Bharatiya Sakshya Adhiniyam, 2023</p>
@@ -280,7 +326,7 @@ function CaseDetail() {
             <p className="bsa-note mt-1 text-xs leading-5 text-muted-foreground">Enter the party’s own details. Do not use the logged-in account name unless that person is the responsible party.</p>
             <p className="mt-3 text-sm leading-6">I, <strong>{certificate.partyName || "NOT PROVIDED — party name required"}</strong>, son/daughter/spouse of <strong>{certificate.partyRelation || "NOT PROVIDED"}</strong>, residing/employed at <strong>{certificate.partyAddress || "NOT PROVIDED"}</strong>, state that I have produced the electronic record/output described below from this digital-record source:</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <CertificateField label="Device / digital-record source" value={certificate.partySource} onChange={(v) => setCertificateField("partySource", v)} placeholder="e.g. Mobile, Computer, Cloud, Storage media" />
+              <CertificateSelect label="Device / digital-record source" value={certificate.partySource} onChange={(v) => setCertificateField("partySource", v)} options={["Computer / Storage Media", "DVR", "Mobile", "Flash Drive", "CD/DVD", "Server", "Cloud", "Other"]} />
               <CertificateField label="Other source detail (if applicable)" value={certificate.partyOtherSource} onChange={(v) => setCertificateField("partyOtherSource", v)} />
               <CertificateField label="Make and model" value={certificate.partyMakeModel} onChange={(v) => setCertificateField("partyMakeModel", v)} />
               <CertificateField label="Colour" value={certificate.partyColor} onChange={(v) => setCertificateField("partyColor", v)} />
@@ -342,7 +388,7 @@ function CaseDetail() {
               <CertificateField label="Son/daughter/spouse of" value={certificate.expertRelation} onChange={(v) => setCertificateField("expertRelation", v)} />
               <CertificateField label="Residing/employed at" value={certificate.expertAddress} onChange={(v) => setCertificateField("expertAddress", v)} />
               <CertificateField label="Expert designation / qualifications" value={certificate.expertDesignation} onChange={(v) => setCertificateField("expertDesignation", v)} />
-              <CertificateField label="Device / digital-record source examined" value={certificate.expertSource} onChange={(v) => setCertificateField("expertSource", v)} placeholder="e.g. Mobile, Computer, Cloud" />
+              <CertificateSelect label="Device / digital-record source examined" value={certificate.expertSource} onChange={(v) => setCertificateField("expertSource", v)} options={["Computer / Storage Media", "DVR", "Mobile", "Flash Drive", "CD/DVD", "Server", "Cloud", "Other"]} />
               <CertificateField label="Other source detail (if applicable)" value={certificate.expertOtherSource} onChange={(v) => setCertificateField("expertOtherSource", v)} />
               <CertificateField label="Make and model" value={certificate.expertMakeModel} onChange={(v) => setCertificateField("expertMakeModel", v)} />
               <CertificateField label="Colour" value={certificate.expertColor} onChange={(v) => setCertificateField("expertColor", v)} />
