@@ -78,7 +78,6 @@ export function SiteHeader() {
           {userEmail && <Link to="/cases" className={link} activeProps={{ className: "text-foreground" }}>Cases</Link>}
           <Link to="/methodology" className={link} activeProps={{ className: "text-foreground" }}>Method</Link>
           <Link to="/section-63" className={link} activeProps={{ className: "text-foreground" }}>Section 63</Link>
-          <a href="https://github.com/Kishordiu/pipertraces" target="_blank" rel="noreferrer" className="rounded-full border border-border bg-white px-4 py-2 text-sm text-foreground transition hover:border-primary/30 hover:bg-secondary/70">Source</a>
           {authReady && (userEmail ? (
             <>
               <span className="max-w-36 truncate text-xs text-muted-foreground" title={userEmail}>{userEmail}</span>
@@ -112,7 +111,6 @@ export function SiteHeader() {
             ) : (
               <Link to="/auth" className={mobileLink + " col-span-2 justify-center"} onClick={closeMenu}><ShieldCheck size={15} className="mr-2" /> Sign in / Create account</Link>
             )}
-            <a href="https://github.com/Kishordiu/pipertraces" target="_blank" rel="noreferrer" className={mobileLink + " col-span-2 justify-center"} onClick={closeMenu}>View source on GitHub ↗</a>
           </nav>
         </div>
       )}
