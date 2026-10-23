@@ -73,6 +73,56 @@ function CaseDetail() {
         {f.quality.notes.map((n) => <p key={n} className="mt-1 text-sm text-muted-foreground">{n}</p>)}
       </section>
 
+      <section className="mt-8 rounded-2xl border border-border bg-card p-6">
+        <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Reader-friendly summary</p>
+        <h2 className="mt-2 font-serif text-3xl italic">What the results mean</h2>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          This section translates the measurements into plain language. It describes visible differences or signal patterns only; it does not decide whether a file is genuine or fraudulent.
+        </p>
+        {c.category === "image" && (
+          <div className="mt-5 space-y-3 text-sm leading-6">
+            <p><strong>What was checked:</strong> PiperTrace compared the uploaded image with a new JPEG copy and measured how much pixel values changed during that re-save.</p>
+            <p><strong>What was observed:</strong> {(() => {
+              const mean = Number(f.signals.find((s) => s.key === "ela_mean")?.value ?? 0);
+              const p99 = Number(f.signals.find((s) => s.key === "ela_p99")?.value ?? 0);
+              return `The average re-save difference is ${mean}/255 and the 99th-percentile difference is ${p99}/255. The ELA map highlights areas with larger re-save differences; text, sharp edges, patterns, and compression can naturally create these highlights.`;
+            })()}</p>
+            <p><strong>Where to look:</strong> Use the Error Level Map beside the original and compare bright/high-contrast areas with the same places in the original. This version of the analysis does not label specific objects or prove that a highlighted area was edited.</p>
+            <p><strong>Plain-language takeaway:</strong> These measurements are review cues, not a verdict. No trained image-manipulation detector or calibrated authenticity score is configured.</p>
+          </div>
+        )}
+        {c.category === "document" && (
+          <div className="mt-5 space-y-3 text-sm leading-6">
+            <p><strong>What was checked:</strong> PiperTrace aligned the uploaded document image with the supplied reference and compared pixel brightness.</p>
+            <p><strong>What was observed:</strong> {(() => {
+              const changed = f.signals.find((s) => s.key === "changed_pct")?.value ?? "not available";
+              const count = f.signals.find((s) => s.key === "regions")?.value ?? f.regions?.length ?? 0;
+              return `${changed}% of pixels crossed the configured difference threshold, grouped into ${count} differing region(s). Differences may come from text or layout changes, but also from scanning, resizing, alignment, lighting, or compression.`;
+            })()}</p>
+            <p><strong>Where to look:</strong> Coordinates below are measured from the top-left corner of the uploaded evidence image (x = from left, y = from top). Width and height describe each rectangular area in pixels. Open the Difference Overlay to see the highlighted locations.</p>
+            {f.dims && f.regions && f.regions.length > 0 ? (
+              <ol className="list-decimal space-y-2 pl-5">
+                {f.regions.slice(0, 8).map((r, i) => {
+                  const cx = r.x + r.w / 2;
+                  const cy = r.y + r.h / 2;
+                  const horizontal = cx < f.dims!.width / 3 ? "left" : cx > (2 * f.dims!.width) / 3 ? "right" : "center";
+                  const vertical = cy < f.dims!.height / 3 ? "upper" : cy > (2 * f.dims!.height) / 3 ? "lower" : "middle";
+                  return <li key={i}><strong>Area {i + 1} — {vertical} {horizontal}:</strong> x={r.x}, y={r.y}, width={r.w}, height={r.h} px; about {r.changed}% of the merged grid cells differed. Inspect this area in both images.</li>;
+                })}
+              </ol>
+            ) : <p>No separate differing regions were stored for this case.</p>}
+            <p><strong>Plain-language takeaway:</strong> A difference confirms the two image files are not pixel-identical in those areas. It does not, by itself, prove fraud or identify who made a change.</p>
+          </div>
+        )}
+        {(c.category === "video" || c.category === "audio") && (
+          <div className="mt-5 space-y-3 text-sm leading-6">
+            <p><strong>What was checked:</strong> {c.category === "video" ? "PiperTrace sampled video frames and measured changes between neighbouring samples." : "PiperTrace measured audio levels, silence, and frequency patterns."}</p>
+            <p><strong>What was observed:</strong> Review the measured-signal table and graphs for timestamps or ranges that stand out. These signals describe the file's technical properties, not whether it is authentic.</p>
+            <p><strong>Plain-language takeaway:</strong> Abrupt changes, silence, clipping, or unusual frequency patterns can occur in ordinary recordings too. No trained deepfake classifier is configured.</p>
+          </div>
+        )}
+      </section>
+
       <section className="mt-8 grid gap-6 md:grid-cols-2">
         {c.category !== "audio" && c.category !== "video" && (
           <Figure label="Original" caption={mask ? "Masked by default to protect personal details." : c.file_name}>
