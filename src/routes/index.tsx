@@ -34,6 +34,14 @@ function Index() {
               <h1 className="mt-6 text-5xl font-medium leading-[1.02] tracking-tight md:text-7xl">
                 Evidence, <span className="font-serif font-normal italic text-primary">not just</span> a verdict.
               </h1>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link to="/auth" className="inline-flex min-h-12 items-center justify-center rounded-full bg-gradient-to-r from-[#315BEB] to-[#35C8D5] px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_-14px_rgba(49,91,235,0.65)] transition hover:-translate-y-0.5">
+                  Sign in / Create account
+                </Link>
+                <Link to="/studio" search={{}} className="inline-flex min-h-12 items-center justify-center rounded-full border border-border bg-white px-6 py-3 text-sm font-medium text-foreground transition hover:border-primary/30 hover:bg-secondary/70">
+                  Open Studio
+                </Link>
+              </div>
             </div>
             <div className="flex flex-col justify-end gap-6 md:col-span-4">
               <p className="text-lg leading-relaxed text-muted-foreground">
