@@ -45,7 +45,7 @@ function CertificateSelect({ label, value, onChange, options }: { label: string;
       <option value="">Select the applicable source type…</option>
       {options.map((option) => <option key={option} value={option}>{option}</option>)}
     </select>
-    <span className="bsa-print-value hidden mt-1 text-sm">{value || "NOT PROVIDED — select before signing"}</span>
+    <span className="bsa-print-value hidden mt-1 text-sm">{value ? "Selected: [X] " + value : "NOT PROVIDED — select before signing"}</span>
   </label>;
 }
 
@@ -64,9 +64,9 @@ function CaseDetail() {
   const [certificate, setCertificate] = useState<CertificateDraft>(() => ({
     partyName: "", partyRelation: "", partyAddress: "", partySource: "", partyOtherSource: "", partyMakeModel: "", partyColor: "", partySerial: "", partyDeviceId: "", partyOtherInfo: "",
     roleOwned: false, roleMaintained: false, roleManaged: false, roleOperated: false, lawfulControlConfirmed: false, normalCourseConfirmed: false, deviceWorking: "unknown", malfunctionImpact: "",
-    partyDate: todayInIndia(), partyTime: timeInIndia(), partyPlace: "",
+    partyDate: "", partyTime: "", partyPlace: "",
     expertName: "", expertRelation: "", expertAddress: "", expertDesignation: "", expertSource: "", expertOtherSource: "", expertMakeModel: "", expertColor: "", expertSerial: "", expertDeviceId: "", expertOtherInfo: "",
-    expertDate: todayInIndia(), expertTime: timeInIndia(), expertPlace: "",
+    expertDate: "", expertTime: "", expertPlace: "",
   }));
   const setCertificateField = <K extends keyof CertificateDraft>(key: K, value: CertificateDraft[K]) => setCertificate((current) => ({ ...current, [key]: value }));
   const q = useQuery({
