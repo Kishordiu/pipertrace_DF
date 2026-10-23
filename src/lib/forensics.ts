@@ -372,9 +372,25 @@ export async function analyzeDocument(file: File, reference: File): Promise<{ re
   const ov = O.ctx.getImageData(0, 0, w, h);
   for (let i = 0; i < n; i++) if (mask[i]) { ov.data[i * 4] = 20; ov.data[i * 4 + 1] = 150; ov.data[i * 4 + 2] = 170; ov.data[i * 4 + 3] = 255; }
   O.ctx.putImageData(ov, 0, 0);
-  O.ctx.strokeStyle = "rgb(200,70,40)";
-  O.ctx.lineWidth = 2;
-  for (const r of regions.slice(0, 40)) O.ctx.strokeRect((r.x * w) / a.width, (r.y * h) / a.height, (r.w * w) / a.width, (r.h * h) / a.height);
+  O.ctx.strokeStyle = "#e02d2d";
+  O.ctx.lineWidth = Math.max(2, Math.round(Math.max(w, h) / 650));
+  O.ctx.font = `bold ${Math.max(12, Math.round(Math.max(w, h) / 45))}px sans-serif`;
+  O.ctx.textBaseline = "top";
+  regions.slice(0, 8).forEach((r, i) => {
+    const rx = (r.x * w) / a.width;
+    const ry = (r.y * h) / a.height;
+    const rw = (r.w * w) / a.width;
+    const rh = (r.h * h) / a.height;
+    O.ctx.strokeRect(rx, ry, rw, rh);
+    const label = `D${i + 1}`;
+    const labelW = O.ctx.measureText(label).width + 10;
+    const labelH = Math.max(20, Math.round(Math.max(w, h) / 40));
+    O.ctx.fillStyle = "#e02d2d";
+    O.ctx.fillRect(rx, Math.max(0, ry - labelH), labelW, labelH);
+    O.ctx.fillStyle = "#ffffff";
+    O.ctx.fillText(label, rx + 5, Math.max(0, ry - labelH) + 2);
+    O.ctx.strokeStyle = "#e02d2d";
+  });
   const overlay = await toBlob(O.c);
 
   const notes: string[] = [];
