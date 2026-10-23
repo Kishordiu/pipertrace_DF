@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">PiperTrace — Evidence, not just a verdict</title>
+  <desc id="desc">PiperTrace local-first digital evidence review for images, documents, video and audio.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b2b31"/>
+      <stop offset=".52" stop-color="#2d4248"/>
+      <stop offset="1" stop-color="#17262c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".35" cy=".5" r=".65">
+      <stop offset="0" stop-color="#89c8d0" stop-opacity=".23"/>
+      <stop offset="1" stop-color="#89c8d0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#91cbd0"/>
+      <stop offset="1" stop-color="#91cbd0" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect x="24" y="24" width="1152" height="582" rx="25" fill="none" stroke="#eaf6f5" stroke-opacity=".1"/>
+  <circle cx="240" cy="312" r="188" fill="#d8f0ef" fill-opacity=".035"/>
+  <circle cx="240" cy="312" r="154" fill="none" stroke="#d8f0ef" stroke-opacity=".12"/>
+  <circle cx="240" cy="312" r="134" fill="none" stroke="#d8f0ef" stroke-opacity=".07" stroke-dasharray="2 12"/>
+  <path transform="translate(91 100) scale(.64)" d="M 176 147 L 169 161 L 164 177 L 159 203 L 158 231 L 139 250 L 127 271 L 127 274 L 140 259 L 143 259 L 135 271 L 127 290 L 127 294 L 138 278 L 141 277 L 142 282 L 137 300 L 137 345 L 147 419 L 150 419 L 164 401 L 170 388 L 173 388 L 173 399 L 169 420 L 161 443 L 154 455 L 154 465 L 164 529 L 167 610 L 164 655 L 159 685 L 152 711 L 159 704 L 179 676 L 198 645 L 213 617 L 230 578 L 240 549 L 243 532 L 243 509 L 236 481 L 239 480 L 250 493 L 252 491 L 255 447 L 254 409 L 250 365 L 240 337 L 226 318 L 226 315 L 229 314 L 238 320 L 241 320 L 230 288 L 223 274 L 213 261 L 216 260 L 233 275 L 233 273 L 210 249 L 215 248 L 228 256 L 223 249 L 209 238 L 179 224 L 178 232 L 181 262 L 213 429 L 216 465 L 216 503 L 213 535 L 208 564 L 196 603 L 195 596 L 203 543 L 204 483 L 198 417 L 191 381 L 191 373 L 186 355 L 186 348 L 172 281 L 167 242 L 167 196 Z M 338 64 L 327 68 L 283 75 L 272 80 L 263 87 L 260 87 L 259 83 L 254 88 L 250 89 L 244 106 L 222 122 L 252 110 L 270 105 L 303 100 L 337 101 L 372 110 L 387 118 L 405 132 L 423 155 L 433 176 L 440 206 L 440 228 L 437 244 L 428 264 L 426 260 L 429 255 L 431 243 L 432 219 L 426 186 L 421 173 L 406 149 L 393 136 L 379 126 L 365 119 L 340 112 L 303 111 L 273 117 L 258 122 L 257 124 L 245 129 L 248 139 L 254 149 L 258 153 L 259 149 L 262 150 L 269 157 L 262 147 L 263 142 L 279 151 L 319 150 L 346 154 L 343 145 L 343 141 L 346 140 L 379 171 L 389 187 L 392 185 L 397 175 L 401 171 L 402 172 L 401 221 L 403 227 L 403 244 L 399 261 L 391 277 L 377 295 L 359 311 L 330 329 L 300 342 L 301 343 L 328 343 L 358 337 L 390 325 L 423 306 L 435 295 L 449 278 L 455 266 L 456 258 L 460 253 L 464 261 L 470 247 L 473 231 L 472 190 L 467 179 L 453 161 L 456 160 L 465 166 L 465 160 L 455 138 L 446 125 L 423 102 L 392 85 L 361 77 L 336 76 L 334 73 L 339 66 Z" fill="#f7f7f4" fill-rule="evenodd" clip-rule="evenodd"/>
+  <path d="M 468 184 L 468 480" stroke="#f7f7f4" stroke-opacity=".15" stroke-width="1.5"/>
+  <text x="535" y="267" fill="#f7f7f4" font-family="Georgia, 'Times New Roman', serif" font-size="74" font-style="italic" letter-spacing="-2">PiperTrace</text>
+  <rect x="536" y="302" width="440" height="2" rx="1" fill="url(#rule)"/>
+  <text x="536" y="359" fill="#f7f7f4" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="600">Evidence, not just a verdict.</text>
+  <text x="538" y="405" fill="#d7e7e6" fill-opacity=".77" font-family="Arial, Helvetica, sans-serif" font-size="20">Local-first digital evidence review</text>
+  <text x="538" y="436" fill="#d7e7e6" fill-opacity=".77" font-family="Arial, Helvetica, sans-serif" font-size="20">Images · Documents · Video · Audio</text>
+  <text x="538" y="550" fill="#b4cdcf" fill-opacity=".62" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="3.5">INTEGRITY FIRST  /  PROVENANCE ALWAYS</text>
+</svg>
