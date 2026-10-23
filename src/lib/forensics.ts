@@ -197,31 +197,6 @@ export async function analyzeImage(file: File): Promise<{ result: AnalysisResult
   elaRegions.sort((a, b) => b.changed - a.changed);
   const reviewRegions = elaRegions.slice(0, 6);
 
-  // Numbered review overlay on the original image. Red boxes locate the strongest
-  // local ELA tiles only; they are not validated edit detections.
-  const reviewCanvas = canvasOf(w, h);
-  reviewCanvas.ctx.drawImage(c, 0, 0, w, h);
-  const lineWidth = Math.max(2, Math.round(Math.max(w, h) / 500));
-  reviewCanvas.ctx.lineWidth = lineWidth;
-  reviewCanvas.ctx.font = `bold ${Math.max(12, Math.round(Math.max(w, h) / 45))}px sans-serif`;
-  reviewCanvas.ctx.textBaseline = "top";
-  reviewRegions.forEach((r, i) => {
-    const rx = r.x * w / bmp.width;
-    const ry = r.y * h / bmp.height;
-    const rw = r.w * w / bmp.width;
-    const rh = r.h * h / bmp.height;
-    reviewCanvas.ctx.strokeStyle = "#e02d2d";
-    reviewCanvas.ctx.strokeRect(rx, ry, rw, rh);
-    const label = `R${i + 1}`;
-    const labelW = reviewCanvas.ctx.measureText(label).width + 10;
-    const labelH = Math.max(20, Math.round(Math.max(w, h) / 40));
-    reviewCanvas.ctx.fillStyle = "#e02d2d";
-    reviewCanvas.ctx.fillRect(rx, Math.max(0, ry - labelH), labelW, labelH);
-    reviewCanvas.ctx.fillStyle = "#ffffff";
-    reviewCanvas.ctx.fillText(label, rx + 5, Math.max(0, ry - labelH) + 2);
-  });
-  const reviewBlob = await toBlob(reviewCanvas.c);
-
   const tMean = tileMeans.reduce((a, b) => a + b, 0) / tileMeans.length;
   const tStd = Math.sqrt(tileMeans.reduce((a, b) => a + (b - tMean) ** 2, 0) / tileMeans.length);
 
@@ -269,10 +244,7 @@ export async function analyzeImage(file: File): Promise<{ result: AnalysisResult
         "No trained manipulation-detection model is configured, so no authenticity score is given.",
       ],
     },
-    maps: [
-      { key: "review-regions", label: "Numbered review areas", blob: reviewBlob, caption: "Red boxes R1–R6 mark the highest local JPEG re-save differences. Review cues only; not confirmed edits or an authenticity score." },
-      { key: "ela", label: "Error level map", blob: elaBlob, caption: "Normalised to the 99th percentile. Brighter = larger recompression error." },
-    ],
+    maps: [{ key: "ela", label: "Error level map", blob: elaBlob, caption: "Normalised to the 99th percentile. Brighter = larger recompression error." }],
   };
 }
 
