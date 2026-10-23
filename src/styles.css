@@ -67,11 +67,23 @@
 
 @layer base {
   * { border-color: var(--color-border); }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
+  }
+  :where(p, h1, h2, h3, h4, h5, li, td, th, label, button, figcaption, dd, dt) {
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
   }
 }
 
@@ -216,4 +228,171 @@
     page-break-inside: auto !important;
   }
   a { color: #17232a !important; text-decoration: none !important; }
+}
+
+
+/* PiperTrace cinematic logo reveal */
+.pipertrace-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #f7f7f4;
+  background:
+    radial-gradient(ellipse at 50% 48%, rgba(68, 107, 115, 0.28), transparent 38%),
+    radial-gradient(ellipse at 50% 110%, rgba(44, 98, 109, 0.25), transparent 48%),
+    linear-gradient(145deg, #1e3036 0%, #2d4248 48%, #1c2c32 100%);
+  opacity: 1;
+  transform: translateZ(0);
+  transition: opacity 680ms cubic-bezier(.22,.8,.3,1), filter 680ms cubic-bezier(.22,.8,.3,1);
+}
+.pipertrace-intro.is-exiting {
+  opacity: 0;
+  filter: blur(12px);
+  pointer-events: none;
+}
+.pipertrace-intro::before,
+.pipertrace-intro::after {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px solid rgba(231, 247, 247, 0.07);
+  border-radius: 28px;
+  pointer-events: none;
+}
+.pipertrace-intro::after {
+  inset: 30px;
+  border-color: rgba(231, 247, 247, 0.035);
+  border-radius: 22px;
+}
+.pipertrace-intro-glow {
+  position: absolute;
+  width: min(75vw, 620px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(182, 225, 226, 0.14) 0%, rgba(113, 173, 182, 0.055) 35%, transparent 70%);
+  filter: blur(14px);
+  animation: pipertrace-glow-breathe 3.6s ease-in-out infinite alternate;
+}
+.pipertrace-intro-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  animation: pipertrace-scene-in 1.2s ease-out 180ms forwards;
+}
+.pipertrace-intro-scene canvas { display: block; width: 100%; height: 100%; }
+.pipertrace-intro-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: min(90vw, 440px);
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+.pipertrace-intro-logo {
+  display: block;
+  width: clamp(100px, 20vw, 158px);
+  height: clamp(138px, 27vw, 210px);
+  object-fit: contain;
+  opacity: 0;
+  filter: blur(26px) brightness(.68);
+  transform: scale(.88) translateY(12px);
+  animation: pipertrace-logo-reveal 2.5s cubic-bezier(.18,.74,.22,1) 120ms forwards;
+  will-change: opacity, filter, transform;
+}
+.pipertrace-intro-name {
+  margin-top: 18px;
+  color: #f8fbf8;
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 5.3vw, 46px);
+  font-style: italic;
+  letter-spacing: -.035em;
+  line-height: 1;
+  opacity: 0;
+  filter: blur(12px);
+  animation: pipertrace-word-reveal 1.4s ease-out 620ms forwards;
+}
+.pipertrace-intro-kicker {
+  margin-top: 14px;
+  color: rgba(227, 242, 242, .58);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .24em;
+  line-height: 1.8;
+  opacity: 0;
+  animation: pipertrace-word-reveal 900ms ease-out 980ms forwards;
+}
+.pipertrace-intro-progress {
+  position: relative;
+  width: 142px;
+  height: 2px;
+  margin-top: 28px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(226, 241, 241, .14);
+  opacity: 0;
+  animation: pipertrace-word-reveal 650ms ease-out 1s forwards;
+}
+.pipertrace-intro-progress span {
+  display: block;
+  width: 34%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #93c9d0, #f8fbf8, #8bbfc7);
+  box-shadow: 0 0 18px rgba(170, 229, 231, .6);
+  animation: pipertrace-progress 1.7s ease-in-out infinite;
+}
+.pipertrace-intro-footer {
+  position: absolute;
+  z-index: 2;
+  right: clamp(34px, 6vw, 74px);
+  bottom: clamp(32px, 5vh, 58px);
+  left: clamp(34px, 6vw, 74px);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: rgba(227, 242, 242, .32);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: .16em;
+  opacity: 0;
+  animation: pipertrace-word-reveal 750ms ease-out 1.2s forwards;
+}
+@keyframes pipertrace-logo-reveal {
+  0% { opacity: 0; filter: blur(26px) brightness(.6); transform: scale(.88) translateY(14px); }
+  42% { opacity: .63; filter: blur(8px) brightness(.88); transform: scale(.98) translateY(2px); }
+  76% { opacity: .93; filter: blur(1.6px) brightness(1); transform: scale(1.015) translateY(0); }
+  100% { opacity: 1; filter: blur(0) brightness(1); transform: scale(1) translateY(0); }
+}
+@keyframes pipertrace-word-reveal {
+  from { opacity: 0; filter: blur(8px); transform: translateY(7px); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+@keyframes pipertrace-scene-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pipertrace-glow-breathe {
+  from { transform: scale(.92); opacity: .72; }
+  to { transform: scale(1.08); opacity: 1; }
+}
+@keyframes pipertrace-progress {
+  0% { transform: translateX(-130%); }
+  100% { transform: translateX(430%); }
+}
+@media (max-width: 520px) {
+  .pipertrace-intro::before { inset: 12px; border-radius: 21px; }
+  .pipertrace-intro::after { inset: 19px; border-radius: 16px; }
+  .pipertrace-intro-footer { flex-direction: column; align-items: center; gap: 8px; bottom: 30px; font-size: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pipertrace-intro-logo, .pipertrace-intro-name, .pipertrace-intro-kicker, .pipertrace-intro-progress, .pipertrace-intro-footer, .pipertrace-intro-scene, .pipertrace-intro-glow {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+  .pipertrace-intro, .pipertrace-intro.is-exiting { transition-duration: 100ms !important; }
 }
