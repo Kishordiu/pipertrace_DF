@@ -26,7 +26,7 @@ type CertificateDraft = {
 function todayInIndia() {
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
   const part = (kind: string) => parts.find((x) => x.type === kind)?.value ?? "";
-  return `${part("year")}-${part("month")}-${part("day")}`;
+  return `${part("day")}/${part("month")}/${part("year")}`;
 }
 function timeInIndia() {
   return new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
@@ -84,7 +84,16 @@ function CaseDetail() {
     qc.invalidateQueries({ queryKey: ["case", id] });
   }
   async function printReport() {
-    await logEvent(c.id, "report_generated", {});
+    if (c.category === "document" && !reveal) {
+      const approved = window.confirm("This case contains a document image that is masked to protect personal details. Reveal the document in the PDF? Only continue if you are in a private place and authorised to include it.");
+      if (approved) {
+        setReveal(true);
+        await logEvent(c.id, "report_generated", { unmasked_document: true });
+        window.setTimeout(() => window.print(), 180);
+        return;
+      }
+    }
+    await logEvent(c.id, "report_generated", { unmasked_document: c.category === "document" && reveal });
     window.print();
   }
   async function remove() {
@@ -316,7 +325,7 @@ function CaseDetail() {
               <p className="bsa-note mt-3 text-xs leading-5 text-muted-foreground">This hash was calculated from the uploaded file using SHA-256. It identifies the byte sequence; by itself it does not establish who created the file, whether its contents are true, or whether the source device was under lawful control.</p>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <CertificateField label="Party’s name (signature block)" value={certificate.partyName} onChange={(v) => setCertificateField("partyName", v)} />
+              <div className="bsa-field"><span className="block text-xs font-semibold">Party signature</span><p className="bsa-print-value mt-1 block text-sm">{certificate.partyName || "NOT PROVIDED — party name required"}</p><p className="mt-2 border-b border-slate-400 pb-2 text-xs text-muted-foreground">Sign here on the final copy</p></div>
               <CertificateField label="Date (DD/MM/YYYY)" value={certificate.partyDate} onChange={(v) => setCertificateField("partyDate", v)} />
               <CertificateField label="Time (IST, 24-hour)" value={certificate.partyTime} onChange={(v) => setCertificateField("partyTime", v)} />
               <div className="sm:col-span-3"><CertificateField label="Place" value={certificate.partyPlace} onChange={(v) => setCertificateField("partyPlace", v)} /></div>
@@ -351,7 +360,7 @@ function CaseDetail() {
               <p className="bsa-note mt-2 text-xs text-muted-foreground">The expert must independently verify the hash against the record they examined and attach/retain the hash report as required.</p>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <CertificateField label="Expert name / signature block" value={certificate.expertName} onChange={(v) => setCertificateField("expertName", v)} />
+              <div className="bsa-field"><span className="block text-xs font-semibold">Expert signature</span><p className="bsa-print-value mt-1 block text-sm">{certificate.expertName || "NOT PROVIDED — expert name required"}</p><p className="mt-2 border-b border-slate-400 pb-2 text-xs text-muted-foreground">Sign here on the final copy</p></div>
               <CertificateField label="Date (DD/MM/YYYY)" value={certificate.expertDate} onChange={(v) => setCertificateField("expertDate", v)} />
               <CertificateField label="Time (IST, 24-hour)" value={certificate.expertTime} onChange={(v) => setCertificateField("expertTime", v)} />
               <div className="sm:col-span-3"><CertificateField label="Place" value={certificate.expertPlace} onChange={(v) => setCertificateField("expertPlace", v)} /></div>
