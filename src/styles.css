@@ -80,10 +80,15 @@
     overflow-wrap: break-word;
     hyphens: none;
   }
-  :where(p, h1, h2, h3, h4, h5, li, td, th, label, button, figcaption, dd, dt) {
+  :where(p, h1, h2, h3, h4, h5, li, td, th, label, button, figcaption, dd, dt, a, span, strong, em, small, summary, blockquote, code) {
     word-break: normal;
     overflow-wrap: break-word;
     hyphens: none;
+  }
+
+  .bsa-hash {
+    overflow-wrap: anywhere;
+    word-break: normal;
   }
 }
 
