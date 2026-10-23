@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,13 +61,29 @@ function CaseDetail() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [reveal, setReveal] = useState(false);
-  const [certificate, setCertificate] = useState<CertificateDraft>(() => ({
-    partyName: "", partyRelation: "", partyAddress: "", partySource: "", partyOtherSource: "", partyMakeModel: "", partyColor: "", partySerial: "", partyDeviceId: "", partyOtherInfo: "",
-    roleOwned: false, roleMaintained: false, roleManaged: false, roleOperated: false, lawfulControlConfirmed: false, normalCourseConfirmed: false, deviceWorking: "unknown", malfunctionImpact: "",
-    partyDate: "", partyTime: "", partyPlace: "",
-    expertName: "", expertRelation: "", expertAddress: "", expertDesignation: "", expertSource: "", expertOtherSource: "", expertMakeModel: "", expertColor: "", expertSerial: "", expertDeviceId: "", expertOtherInfo: "",
-    expertDate: "", expertTime: "", expertPlace: "",
-  }));
+  const [certificate, setCertificate] = useState<CertificateDraft>(() => {
+    const initial: CertificateDraft = {
+      partyName: "", partyRelation: "", partyAddress: "", partySource: "", partyOtherSource: "", partyMakeModel: "", partyColor: "", partySerial: "", partyDeviceId: "", partyOtherInfo: "",
+      roleOwned: false, roleMaintained: false, roleManaged: false, roleOperated: false, lawfulControlConfirmed: false, normalCourseConfirmed: false, deviceWorking: "unknown", malfunctionImpact: "",
+      partyDate: "", partyTime: "", partyPlace: "",
+      expertName: "", expertRelation: "", expertAddress: "", expertDesignation: "", expertSource: "", expertOtherSource: "", expertMakeModel: "", expertColor: "", expertSerial: "", expertDeviceId: "", expertOtherInfo: "",
+      expertDate: "", expertTime: "", expertPlace: "",
+    };
+    if (typeof window === "undefined") return initial;
+    try {
+      const saved = window.sessionStorage.getItem("pipertrace:section63:" + id);
+      return saved ? { ...initial, ...(JSON.parse(saved) as Partial<CertificateDraft>) } : initial;
+    } catch {
+      return initial;
+    }
+  });
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem("pipertrace:section63:" + id, JSON.stringify(certificate));
+    } catch {
+      // Private browsing or storage limits can disable session persistence.
+    }
+  }, [id, certificate]);
   const setCertificateField = <K extends keyof CertificateDraft>(key: K, value: CertificateDraft[K]) => setCertificate((current) => ({ ...current, [key]: value }));
   const q = useQuery({
     queryKey: ["case", id],
@@ -110,6 +126,7 @@ function CaseDetail() {
   async function remove() {
     if (!confirm("Delete this case, its files and audit log permanently?")) return;
     await deleteCase(c);
+    try { window.sessionStorage.removeItem("pipertrace:section63:" + id); } catch {}
     qc.invalidateQueries({ queryKey: ["cases"] });
     navigate({ to: "/cases" });
   }
@@ -316,6 +333,7 @@ function CaseDetail() {
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">Bharatiya Sakshya Adhiniyam, 2023</p>
           <h2 className="mt-2 font-serif text-3xl italic">Section 63 — Schedule certificate draft</h2>
           <p className="bsa-note mt-2 text-sm leading-6 text-muted-foreground">Structured against the Schedule referred to in Section 63(4)(c). File facts and SHA-256 below are automatically populated from the uploaded bytes. Identity, device custody, ordinary-course statements, and signatures must be supplied and verified by the actual party and expert. This application does not sign or certify those declarations.</p>
+          <p className="mt-2 rounded-lg bg-[#f7fafb] p-3 text-xs leading-5 text-muted-foreground">Your unfinished certificate fields are saved only in this browser tab's session storage so a refresh does not immediately erase them. They are not uploaded to Supabase as part of this draft.</p>
           <div className="mt-4 rounded-lg border border-[#e6c88e] bg-[#fff9e9] p-3 text-sm leading-6">
             <strong>Before use:</strong> Do not sign any unchecked or unverified statement. Part A is completed by the party; Part B is completed by the expert. Attach the hash report below and have the completed certificate reviewed by the responsible legal professional.
             <p className="mt-2"><a className="underline underline-offset-2" href="https://www.indiacode.nic.in/bitstream/123456789/20063/1/a2023-47.pdf" target="_blank" rel="noreferrer">Official India Code text of the Act and Schedule</a></p>
