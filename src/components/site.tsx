@@ -68,7 +68,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
-        <Link to="/" onClick={closeMenu} className="flex shrink-0 items-baseline gap-2" aria-label="PiperTrace home">
+        <Link to="/" onClick={closeMenu} className="flex shrink-0 items-center gap-2.5" aria-label="PiperTrace home">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2d4248] p-1.5 shadow-sm"><img src="/pipertrace-mark.svg" alt="" className="h-full w-full object-contain" /></span>
           <span className="font-serif text-xl italic sm:text-2xl">PiperTrace</span>
           <span className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground sm:inline">forensics</span>
         </Link>
