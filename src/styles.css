@@ -158,6 +158,23 @@
     object-fit: contain !important;
     border-radius: 1mm !important;
   }
+  .report-image-evidence {
+    width: fit-content !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin-inline: auto !important;
+  }
+  .report-image-evidence > img {
+    width: auto !important;
+    height: 125mm !important;
+    max-width: 100% !important;
+    max-height: 125mm !important;
+    object-fit: contain !important;
+  }
+  .report-image-evidence > svg {
+    width: 100% !important;
+    height: 100% !important;
+  }
   .report-figure-ela { display: none !important; }
   .report-chart { display: none !important; }
   .report-table, .report-table tr, .bsa-panel, .bsa-field {
