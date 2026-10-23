@@ -11,6 +11,7 @@ import {
 import type { ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
+import { ThreeLogoLoader } from "@/components/ThreeLogoLoader";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -74,5 +75,5 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  return <QueryClientProvider client={queryClient}><Outlet /><Toaster /></QueryClientProvider>;
+  return <QueryClientProvider client={queryClient}><Outlet /><Toaster /><ThreeLogoLoader /></QueryClientProvider>;
 }
