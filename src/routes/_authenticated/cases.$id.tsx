@@ -208,9 +208,9 @@ function CaseDetail() {
               return `${changed}% of aligned pixels crossed the configured brightness-difference threshold. The analysis grouped them into ${count} connected region(s). These are pixel-level differences, not an automated identification of changed text fields.`;
             })()}</p>
             <p><strong>Where to look:</strong> Coordinates below are measured from the top-left corner of the uploaded evidence image (x = from left, y = from top). Width and height describe each rectangular area in pixels. Open the Difference Overlay to see the highlighted locations.</p>
-            {f.dims && visualReviewRegions.length > 0 ? (
+            {f.dims && f.regions && f.regions.length > 0 ? (
               <ol className="list-decimal space-y-2 pl-5">
-                {visualReviewRegions.map((r, i) => {
+                {f.regions.map((r, i) => {
                   const cx = r.x + r.w / 2;
                   const cy = r.y + r.h / 2;
                   const horizontal = cx < f.dims!.width / 3 ? "left" : cx > (2 * f.dims!.width) / 3 ? "right" : "center";
@@ -501,5 +501,5 @@ function Figure({ label, caption, children, variant = "" }: { label: string; cap
   return <figure className={`report-figure rounded-2xl border border-border bg-card p-4 ${variant}`}><p className="mb-3 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{label}</p>{children}<figcaption className="report-muted mt-2 text-xs text-muted-foreground">{caption}</figcaption></figure>;
 }
 function Row({ k, v }: { k: string; v: string }) {
-  return <div><dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{k}</dt><dd className="break-all">{v}</dd></div>;
+  return <div><dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{k}</dt><dd className="break-words">{v}</dd></div>;
 }
