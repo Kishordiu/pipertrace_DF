@@ -11,6 +11,17 @@ function isRecoveryCallback() {
   return typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mode") === "recovery";
 }
 
+// OAuth/email callbacks must never return a phone user to an unreachable localhost URL.
+// Local development sign-in returns to the live app unless a non-local origin is being used.
+const PRODUCTION_APP_ORIGIN = "https://diufoundry-storybook.vercel.app";
+
+function authReturnUrl(query = "") {
+  if (typeof window === "undefined") return `${PRODUCTION_APP_ORIGIN}/auth${query}`;
+  const { hostname, origin } = window.location;
+  const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+  return `${isLocalhost ? PRODUCTION_APP_ORIGIN : origin}/auth${query}`;
+}
+
 export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
@@ -93,7 +104,7 @@ function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { emailRedirectTo: window.location.origin + "/auth" },
+          options: { emailRedirectTo: authReturnUrl() },
         });
         if (error) throw error;
         setPassword("");
@@ -110,7 +121,7 @@ function AuthPage() {
 
       if (mode === "reset-request") {
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-          redirectTo: window.location.origin + "/auth?mode=recovery",
+          redirectTo: authReturnUrl("?mode=recovery"),
         });
         if (error) throw error;
         setMode("sign-in");
@@ -141,7 +152,7 @@ function AuthPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: window.location.origin + "/auth",
+          redirectTo: authReturnUrl(),
           // Request only the standard Google identity needed for sign-in.
           // Additional Google APIs must have a separate, explicit consent flow.
           scopes: "openid email profile",
