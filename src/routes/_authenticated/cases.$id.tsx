@@ -25,6 +25,7 @@ function CaseDetail() {
       const { data: ev } = await supabase.from("audit_events").select("*").eq("case_id", id).order("created_at");
       const f = c.findings as unknown as StoredFindings;
       const urls: Record<string, string> = { original: await signedUrl(c.storage_path) };
+      if (c.reference_path) urls.reference = await signedUrl(c.reference_path);
       for (const m of f.maps ?? []) urls[m.key] = await signedUrl(m.path);
       return { c, f, ev: ev ?? [], urls };
     },
@@ -87,8 +88,19 @@ function CaseDetail() {
               const p99 = Number(f.signals.find((s) => s.key === "ela_p99")?.value ?? 0);
               return `The average re-save difference is ${mean}/255 and the 99th-percentile difference is ${p99}/255. The ELA map highlights areas with larger re-save differences; text, sharp edges, patterns, and compression can naturally create these highlights.`;
             })()}</p>
-            <p><strong>Where to look:</strong> Use the Error Level Map beside the original and compare bright/high-contrast areas with the same places in the original. This version of the analysis does not label specific objects or prove that a highlighted area was edited.</p>
-            <p><strong>Plain-language takeaway:</strong> These measurements are review cues, not a verdict. No trained image-manipulation detector or calibrated authenticity score is configured.</p>
+            <p><strong>Where to look:</strong> The report now lists the highest local recompression-difference regions with coordinates measured from the image's top-left corner (x = left, y = top). These identify where to inspect first, not where an edit is confirmed.</p>
+            {f.dims && f.regions && f.regions.length > 0 ? (
+              <ol className="list-decimal space-y-2 pl-5">
+                {f.regions.slice(0, 8).map((r, i) => {
+                  const cx = r.x + r.w / 2;
+                  const cy = r.y + r.h / 2;
+                  const horizontal = cx < f.dims!.width / 3 ? "left" : cx > (2 * f.dims!.width) / 3 ? "right" : "center";
+                  const vertical = cy < f.dims!.height / 3 ? "upper" : cy > (2 * f.dims!.height) / 3 ? "lower" : "middle";
+                  return <li key={i}><strong>Review area {i + 1} — {vertical} {horizontal}:</strong> x={r.x}, y={r.y}, width={r.w}, height={r.h} px; mean local ELA difference {r.changed}/255. Compare this crop against a trusted source if available.</li>;
+                })}
+              </ol>
+            ) : <p>No distinct high-difference regions were separated by the current ELA grid.</p>}
+            <p><strong>Plain-language takeaway:</strong> A single image cannot establish exactly which text, number, or photo was changed. ELA can highlight compression differences caused by edits, ordinary text/edges, saving, or scanning. For field-level findings, create a Document Comparison case using the questioned image and a trusted original.</p>
           </div>
         )}
         {c.category === "document" && (
@@ -124,10 +136,16 @@ function CaseDetail() {
       </section>
 
       <section className="mt-8 grid gap-6 md:grid-cols-2">
+        {c.category === "document" && urls.reference && (
+          <Figure label="Reference original" caption={mask ? "Reference is masked by default to protect personal details." : (c.reference_name ?? "Supplied reference")}>
+            <img src={urls.reference} alt="Reference original document" className={`w-full rounded-lg ${mask ? "blur-xl" : ""}`} />
+            {mask && <p className="mt-2 text-xs text-muted-foreground">Reveal the document to inspect the reference and questioned image together.</p>}
+          </Figure>
+        )}
         {c.category !== "audio" && c.category !== "video" && (
-          <Figure label="Original" caption={mask ? "Masked by default to protect personal details." : c.file_name}>
-            <img src={urls["original"]} alt="Original evidence" className={`w-full rounded-lg ${mask ? "blur-xl" : ""}`} />
-            {c.category === "document" && <button onClick={() => setReveal(!reveal)} className="mt-2 text-xs text-primary print:hidden">{reveal ? "Mask" : "Reveal"}</button>}
+          <Figure label={c.category === "document" ? "Questioned document" : "Original image"} caption={mask ? "Masked by default to protect personal details." : c.file_name}>
+            <img src={urls["original"]} alt={c.category === "document" ? "Questioned document" : "Original evidence"} className={`w-full rounded-lg ${mask ? "blur-xl" : ""}`} />
+            {c.category === "document" && <button onClick={() => setReveal(!reveal)} className="mt-2 text-xs text-primary print:hidden">{reveal ? "Mask" : "Reveal"} both document images</button>}
           </Figure>
         )}
         {c.category === "video" && <Figure label="Original" caption={c.file_name}><video src={urls["original"]} controls className="w-full rounded-lg bg-ink" /></Figure>}
