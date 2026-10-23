@@ -1,56 +1,77 @@
-# PiperTrace
+<div align="center">
+  <img src="./assets/hero-banner.svg" alt="PiperTrace — Multimodal Media Forensics" width="100%" />
+</div>
 
-**Evidence, not just a verdict.**
+<p align="center">
+  <a href="https://diufoundry-storybook.vercel.app"><img alt="Live Platform" src="https://img.shields.io/badge/LIVE_PLATFORM-0A1826?style=for-the-badge&logo=vercel&logoColor=35C8D5&labelColor=060A0F" /></a>&nbsp;
+  <a href="https://diufoundry.online"><img alt="DIU Foundry" src="https://img.shields.io/badge/DIU_FOUNDRY-STUDIO-0A1826?style=for-the-badge&logoColor=6BC6CE&labelColor=060A0F" /></a>&nbsp;
+  <img alt="TypeScript" src="https://img.shields.io/badge/TYPESCRIPT-v5-0A1826?style=for-the-badge&logo=typescript&logoColor=3178C6&labelColor=060A0F" />&nbsp;
+  <img alt="Supabase" src="https://img.shields.io/badge/SUPABASE-AUTH_&_RLS-0A1826?style=for-the-badge&logo=supabase&logoColor=3ECF8E&labelColor=060A0F" />
+</p>
 
-PiperTrace is a local-first multimodal media-forensics workspace for images, documents, video and audio. It records SHA-256 fingerprints, runs category-specific signal inspection in the browser, stores user-owned cases in Supabase, and prepares a technical report with methodology and limitations.
+<p align="center">
+  <b>Evidence, not just a verdict.</b><br/>
+  <em>Local-first multimodal media-forensics workspace for evidentiary integrity across images, documents, video, and audio.</em>
+</p>
 
-## Product capabilities
+---
 
-- Four distinct workflows: Image, Document, Video and Audio.
-- Local signal inspection with explicit measurements, quality notes and limitations.
-- Reference-image comparison for document/edit inspection.
-- SHA-256 hashing and integrity re-verification.
-- Private, per-account case records and evidence files.
-- Audit event timeline and technical report view.
-- Section 63 BSA documentation-preparation aid.
-- No Gemini or commercial detection API key is required for the browser-local analysis.
+## 🔬 Product Capabilities
 
-**Scientific limitation:** a measured signal, ELA/FFT view or difference map is not, by itself, a trained deepfake verdict. PiperTrace must not display a real/fake score unless a suitable trained and evaluated model is actually configured.
+PiperTrace shifts forensic investigation from unverified black-box verdicts to verifiable evidentiary signals:
 
-## Stack
+- **Multimodal Workflows** — Four distinct signal inspection pipelines: Image, Document, Video, and Audio.
+- **Local Signal Inspection** — Category-specific signal measurements (ELA, FFT spectrum, luminance, difference maps) computed entirely client-side.
+- **Evidentiary Integrity** — Browser Web Crypto SHA-256 fingerprinting and continuous re-verification against tampering.
+- **Reference Document Comparison** — Differential pixel & structural delta mapping for altered legal contracts and documents.
+- **Section 63 BSA Documentation** — Structured preparation aid aligning digital media examination with legal audit criteria.
+- **Zero API Dependency** — Core signal measurements run without third-party commercial AI or external detection endpoints.
 
-- React 19, TypeScript, Vite and TanStack Start.
-- Tailwind CSS v4.
-- Supabase Auth, Postgres and private Storage.
-- Browser Web Crypto for SHA-256.
-- Canvas/Web Audio APIs for local signal inspection.
+> **Forensic Standard**: A measured signal, ELA/FFT view, or difference map is an evidentiary measurement, not an autonomous deepfake verdict. PiperTrace produces auditable technical documentation.
 
-## Start locally
+---
 
-Requirements: Node.js supported by Vite 8 and Bun (recommended).
+## 🛠️ System Architecture
 
-1. Copy `.env.example` to `.env`.
-2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` for your own Supabase project.
-3. Follow `docs/PROJECT_SETUP.md` and apply `supabase/setup.sql` to that project.
-4. Run:
+```text
+[ CLIENT WORKBENCH ] ── (SHA-256 Hash) ──► [ LOCAL SIGNAL ENGINE ]
+         │                                          │
+         ▼                                          ▼
+[ BROWSER WEB CRYPTO ]                     [ CANVAS / WEB AUDIO ]
+         │                                   (ELA / FFT / Diffs)
+         │                                          │
+         ▼                                          ▼
+[ SUPABASE AUTH / RLS ] ◄── (Audit Trails) ─────────┘
+```
 
-    bun install
-    bun run dev
+- **Framework**: React 19, TypeScript, Vite, TanStack Start
+- **Styling & Motion**: Tailwind CSS v4, Instrument Serif, JetBrains Mono
+- **Database & Storage**: Supabase Postgres with strict Row-Level Security & private evidence buckets
+- **Cryptography**: Web Crypto API (Client-side SHA-256)
 
-Checks:
+---
 
-    bun run build
-    bun run lint
-    bun run test
+## ⚡ Quickstart
 
-## Production setup
+```bash
+# Clone the repository
+git clone https://github.com/Kishordiu/pipertrace_DF.git
+cd pipertrace_DF
 
-Start with **[docs/PROJECT_SETUP.md](docs/PROJECT_SETUP.md)**. It documents the owned Supabase project, database/storage setup, Vercel variables, auth redirects, Google OAuth callback and end-to-end smoke test.
+# Install dependencies (Bun recommended)
+bun install
 
-Google sign-in requires the Google provider to be enabled in Supabase and a Client ID/Secret saved in its provider settings. The browser app uses only the anon/publishable key; never put a service-role key into a `VITE_*` variable or commit it.
+# Configure environment variables
+cp .env.example .env
+# Fill VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY
 
-## Evidence and privacy
+# Start the local development studio
+bun run dev
+```
 
-Case rows and audit events are restricted with Supabase Row Level Security. Evidence files are stored under an owner-specific path in a private Storage bucket. Use only media you are authorized to inspect. Use synthetic documents for test cases and delete sensitive cases when no longer needed.
+---
 
-Generated reports are technical summaries and documentation aids, not automatic legal certificates or guarantees of admissibility.
+<p align="center">
+  <b>RESEARCH → BUILD → TEST → SHIP</b><br/>
+  <sub>A digital product by <a href="https://diufoundry.online">DIU Foundry</a> · Engineered by K. Kishor Kumar</sub>
+</p>
