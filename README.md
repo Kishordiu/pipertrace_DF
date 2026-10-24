@@ -23,11 +23,11 @@
 PiperTrace shifts forensic investigation from unverified black-box verdicts to verifiable evidentiary signals:
 
 - **Multimodal Workflows** — Four distinct signal inspection pipelines: Image, Document, Video, and Audio.
-- **Local Signal Inspection** — Category-specific signal measurements (ELA, FFT spectrum, luminance, difference maps) computed entirely client-side.
+- **Signal inspection** — The UI includes category-specific views such as ELA, FFT spectrum, luminance, and difference maps; verify each input path and interpretation against the current implementation.
 - **Evidentiary Integrity** — Browser Web Crypto SHA-256 fingerprinting and continuous re-verification against tampering.
 - **Reference Document Comparison** — Differential pixel & structural delta mapping for altered legal contracts and documents.
 - **Section 63 BSA Documentation** — Structured preparation aid aligning digital media examination with legal audit criteria.
-- **Zero API Dependency** — Core signal measurements run without third-party commercial AI or external detection endpoints.
+- **Client-side signal analysis** — Several inspection views are designed around browser-side measurements rather than third-party AI verdict endpoints; authentication, case persistence, and evidence storage still depend on configured Supabase services.
 
 > **Forensic boundary:** A measured signal, ELA/FFT view, or difference map is an inspection aid, not an autonomous deepfake verdict. Results require qualified human interpretation and corroborating evidence. This project is not a forensic certification or legal opinion, and its documentation aids do not replace advice from qualified counsel.
 
@@ -48,7 +48,7 @@ PiperTrace shifts forensic investigation from unverified black-box verdicts to v
 
 - **Framework**: React 19, TypeScript, Vite, TanStack Start
 - **Styling & Motion**: Tailwind CSS v4, Instrument Serif, JetBrains Mono
-- **Database & Storage**: Supabase Postgres with strict Row-Level Security & private evidence buckets
+- **Database & Storage**: Supabase schema, owner-scoped Row Level Security policies, and a private evidence-bucket setup script are included; review the deployed project's policy and bucket settings before real use.
 - **Cryptography**: Web Crypto API (Client-side SHA-256)
 
 ---
