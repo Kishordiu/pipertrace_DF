@@ -2,6 +2,8 @@
   <img src="./assets/hero.png" alt="PiperTrace — Multimodal Media Forensics" width="100%" />
 </div>
 
+# PiperTrace
+
 <p align="center">
   <img alt="Project status" src="https://img.shields.io/badge/STATUS-FORENSICS_WORKSPACE-0A1826?style=for-the-badge&logoColor=35C8D5&labelColor=060A0F" />&nbsp;
   <a href="https://diufoundry.online"><img alt="DIU Foundry" src="https://img.shields.io/badge/DIU_FOUNDRY-STUDIO-0A1826?style=for-the-badge&logoColor=6BC6CE&labelColor=060A0F" /></a>&nbsp;
